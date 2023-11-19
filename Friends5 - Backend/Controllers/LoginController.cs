@@ -30,9 +30,9 @@ namespace Friends5___Backend.Controllers
         private string GenerateJwtToken(LoginInfo info)
         {
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, info.Username)
-        };
+            {
+                new Claim(ClaimTypes.Name, info.Username)
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetValue<string>("Jwt:Key")!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
