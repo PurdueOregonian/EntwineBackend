@@ -10,10 +10,10 @@ namespace Friends5___Backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class LoginController : ControllerBase
+    public class AuthController : ControllerBase
     {
         IConfiguration _config;
-        public LoginController(IConfiguration config)
+        public AuthController(IConfiguration config)
         {
             _config = config;
         }
