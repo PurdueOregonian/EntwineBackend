@@ -7,17 +7,19 @@ namespace Friends5___Backend.Controllers
     [Route("[controller]")]
     public class ProfileController : ControllerBase
     {
+        IConfiguration _config;
         private readonly ILogger<ProfileController> _logger;
 
-        public ProfileController(ILogger<ProfileController> logger)
+        public ProfileController(ILogger<ProfileController> logger, IConfiguration config)
         {
             _logger = logger;
+            _config = config;
         }
 
         [HttpPost("/SaveProfile")]
         public async Task<IActionResult> SaveProfileAsync([FromBody] ProfileData data)
         {
-            var connectionString = "Host=localhost;Username=postgres;Password=eleanordonahue;Database=postgres";
+            var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
             await using var dataSource = NpgsqlDataSource.Create(connectionString);
 
             await using (var cmd = dataSource.CreateCommand("INSERT INTO public.profiles(\"Name\", \"Interest\") VALUES ('Joseph', 'Pizza');"))
