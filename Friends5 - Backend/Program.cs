@@ -1,3 +1,5 @@
+using Friends5___Backend.DbContext;
+using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -10,6 +12,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddDbContext<FriendsDbContext>(options => {
+    options.UseNpgSql(builder.Configuration.GetValue<string>("ConnectionStrings:DefaultConnection"));
+});
 
 builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {

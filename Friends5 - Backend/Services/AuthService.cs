@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Friends5___Backend.Services
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly PasswordHasher<string> _passwordHasher;

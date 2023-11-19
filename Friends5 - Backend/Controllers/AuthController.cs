@@ -1,4 +1,5 @@
 using Friends5___Backend.Authentication;
+using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -12,10 +13,13 @@ namespace Friends5___Backend.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        IConfiguration _config;
-        public AuthController(IConfiguration config)
+        private readonly IConfiguration _config;
+        private readonly IAuthService _authService;
+
+        public AuthController(IConfiguration config, IAuthService authService)
         {
             _config = config;
+            _authService = authService;
         }
 
         [AllowAnonymous]
@@ -25,6 +29,13 @@ namespace Friends5___Backend.Controllers
             var token = GenerateJwtToken(info);
 
             return Ok(new { token });
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<bool> RegisterUser([FromBody] LoginInfo info)
+        {
+            return await _authService.RegisterUser(info);
         }
 
         private string GenerateJwtToken(LoginInfo info)
