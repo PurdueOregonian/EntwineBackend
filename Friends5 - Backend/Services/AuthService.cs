@@ -6,19 +6,16 @@ namespace Friends5___Backend.Services
     public class AuthService : IAuthService
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly PasswordHasher<string> _passwordHasher;
 
-        public AuthService(UserManager<IdentityUser> userManager, PasswordHasher<string> passwordHasher)
+        public AuthService(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
-            _passwordHasher = passwordHasher;
         }
         public async Task<bool> RegisterUser(LoginInfo loginInfo)
         {
             var identityUser = new IdentityUser
             {
-                UserName = loginInfo.Username,
-                PasswordHash = _passwordHasher.HashPassword(loginInfo.Username, loginInfo.Password)
+                UserName = loginInfo.Username
             };
 
             var result = await _userManager.CreateAsync(identityUser, loginInfo.Password);

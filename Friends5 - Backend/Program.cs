@@ -1,6 +1,7 @@
 using Friends5___Backend.DbContext;
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -17,6 +18,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddDbContext<FriendsDbContext>(options => {
     options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:DefaultConnection"));
 });
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<FriendsDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {

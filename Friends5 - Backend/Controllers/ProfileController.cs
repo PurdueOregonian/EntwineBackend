@@ -4,7 +4,7 @@ using Npgsql;
 namespace Friends5___Backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class ProfileController : ControllerBase
     {
         IConfiguration _config;

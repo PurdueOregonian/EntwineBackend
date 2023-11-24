@@ -10,7 +10,7 @@ using System.Text;
 namespace Friends5___Backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _config;
@@ -23,7 +23,7 @@ namespace Friends5___Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginInfo info)
         {
             var token = GenerateJwtToken(info);
@@ -32,7 +32,7 @@ namespace Friends5___Backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpPost("Register")]
         public async Task<bool> RegisterUser([FromBody] LoginInfo info)
         {
             return await _authService.RegisterUser(info);
