@@ -18,16 +18,33 @@ namespace Friends5___Backend.Services
                 UserName = loginInfo.Username
             };
 
-            var result = await _userManager.CreateAsync(identityUser, loginInfo.Password);
-            return result.Succeeded;
+            try
+            {
+                var result = await _userManager.CreateAsync(identityUser, loginInfo.Password);
+                return result.Succeeded;
+            }
+            catch (Exception ex)
+            {
+                var a = 5;
+                return false;
+            }
         }
         public async Task<bool> Login(LoginInfo loginInfo)
         {
-            var user = await _userManager.FindByNameAsync(loginInfo.Username);
-            if (user == null) {
+            try
+            {
+                var user = await _userManager.FindByNameAsync(loginInfo.Username);
+                if (user == null)
+                {
+                    return false;
+                }
+                return await _userManager.CheckPasswordAsync(user, loginInfo.Password);
+            }
+            catch(Exception ex)
+            {
+                var a = 5;
                 return false;
             }
-            return await _userManager.CheckPasswordAsync(user, loginInfo.Password);
         }
     }
 }

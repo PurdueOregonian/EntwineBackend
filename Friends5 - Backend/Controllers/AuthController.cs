@@ -24,11 +24,18 @@ namespace Friends5___Backend.Controllers
 
         [AllowAnonymous]
         [HttpPost("Login")]
-        public IActionResult Login([FromBody] LoginInfo info)
+        public async Task<IActionResult> Login([FromBody] LoginInfo info)
         {
-            var token = GenerateJwtToken(info);
-
-            return Ok(new { token });
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            if (await _authService.Login(info))
+            {
+                var tokenString = GenerateJwtToken(info);
+                return Ok(tokenString);
+            }
+            return BadRequest();
         }
 
         [AllowAnonymous]
