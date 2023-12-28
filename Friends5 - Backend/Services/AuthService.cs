@@ -11,7 +11,7 @@ namespace Friends5___Backend.Services
         {
             _userManager = userManager;
         }
-        public async Task<bool> RegisterUser(LoginInfo loginInfo)
+        public async Task<IdentityResult> RegisterUser(LoginInfo loginInfo)
         {
             var identityUser = new IdentityUser
             {
@@ -21,12 +21,11 @@ namespace Friends5___Backend.Services
             try
             {
                 var result = await _userManager.CreateAsync(identityUser, loginInfo.Password);
-                return result.Succeeded;
+                return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var a = 5;
-                return false;
+                return IdentityResult.Failed(new IdentityError { Code = "CustomErrorCode", Description = "An error occurred while creating the user." });
             }
         }
         public async Task<bool> Login(LoginInfo loginInfo)

@@ -1,6 +1,7 @@
 using Friends5___Backend.Authentication;
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -40,9 +41,14 @@ namespace Friends5___Backend.Controllers
 
         [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<bool> RegisterUser([FromBody] LoginInfo info)
+        public async Task<IActionResult> RegisterUser([FromBody] LoginInfo info)
         {
-            return await _authService.RegisterUser(info);
+            var registerResult = await _authService.RegisterUser(info);
+            if(registerResult.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest(registerResult.Errors.First().Description);
         }
 
         private string GenerateJwtToken(LoginInfo info)
