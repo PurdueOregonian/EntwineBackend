@@ -28,21 +28,20 @@ namespace Friends5___Backend.Services
                 return IdentityResult.Failed(new IdentityError { Code = "CustomErrorCode", Description = "An error occurred while creating the user." });
             }
         }
-        public async Task<bool> Login(LoginInfo loginInfo)
+        public async Task<LoginResult> Login(LoginInfo loginInfo)
         {
             try
             {
                 var user = await _userManager.FindByNameAsync(loginInfo.Username);
                 if (user == null)
                 {
-                    return false;
+                    return new LoginResult { Success = false };
                 }
-                return await _userManager.CheckPasswordAsync(user, loginInfo.Password);
+                return new LoginResult { Success = await _userManager.CheckPasswordAsync(user, loginInfo.Password) };
             }
             catch(Exception ex)
             {
-                var a = 5;
-                return false;
+                return new LoginResult { Success = false, ErrorMessage = ex.Message };
             }
         }
     }

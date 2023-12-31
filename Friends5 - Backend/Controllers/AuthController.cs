@@ -31,12 +31,17 @@ namespace Friends5___Backend.Controllers
             {
                 return BadRequest();
             }
-            if (await _authService.Login(info))
+            var loginResult = await _authService.Login(info);
+            if (loginResult.Success)
             {
                 var tokenString = GenerateJwtToken(info);
                 return Ok(tokenString);
             }
-            return BadRequest();
+            if (loginResult.ErrorMessage != null)
+            {
+                return StatusCode(500);
+            }
+            return BadRequest("Incorrect username or password.");
         }
 
         [AllowAnonymous]
