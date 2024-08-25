@@ -55,6 +55,23 @@ namespace Friends5___Backend.Controllers
             return BadRequest(registerResult.Errors.First().Description);
         }
 
+        
+        [HttpPost("Logout")]
+        public IActionResult Logout()
+        {
+            var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token not provided.");
+            }
+
+            // Call your AuthService to handle the logout process
+            _authService.Logout(token);
+
+            return Ok(new { message = "Logged out successfully" });
+        }
+
         private string GenerateJwtToken(LoginInfo info)
         {
             var claims = new List<Claim>

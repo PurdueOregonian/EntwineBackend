@@ -1,3 +1,4 @@
+using Friends5___Backend.Authentication;
 using Friends5___Backend.DbContext;
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -52,6 +53,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<TokenBlacklistMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

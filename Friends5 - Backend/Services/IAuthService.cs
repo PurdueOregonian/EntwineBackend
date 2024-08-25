@@ -7,5 +7,6 @@ namespace Friends5___Backend.Services
     {
         public Task<IdentityResult> RegisterUser(LoginInfo loginInfo);
         public Task<LoginResult> Login(LoginInfo loginInfo);
+        public void Logout(string token);
     }
 }

@@ -1,11 +1,13 @@
 ﻿using Friends5___Backend.Authentication;
 using Microsoft.AspNetCore.Identity;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Friends5___Backend.Services
 {
     public class AuthService : IAuthService
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly TokenBlacklist _tokenBlacklist = new();
 
         public AuthService(UserManager<IdentityUser> userManager)
         {
@@ -43,6 +45,11 @@ namespace Friends5___Backend.Services
             {
                 return new LoginResult { Success = false, ErrorMessage = ex.Message };
             }
+        }
+
+        public void Logout(string token)
+        {
+            _tokenBlacklist.AddToken(token);
         }
     }
 }
