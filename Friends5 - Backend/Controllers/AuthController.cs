@@ -10,7 +10,7 @@ using System.Text;
 namespace Friends5___Backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/Auth")]
     public class AuthController : ControllerBase
     {
         private readonly IConfiguration _config;

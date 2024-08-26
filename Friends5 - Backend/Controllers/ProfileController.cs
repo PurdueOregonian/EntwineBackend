@@ -5,7 +5,7 @@ using Npgsql;
 namespace Friends5___Backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/Profile")]
     [Authorize]
     public class ProfileController : ControllerBase
     {
@@ -18,7 +18,7 @@ namespace Friends5___Backend.Controllers
             _config = config;
         }
 
-        [HttpPost("SaveProfile")]
+        [HttpPost("Save")]
         public async Task<IActionResult> SaveProfileAsync([FromBody] ProfileData data)
         {
             var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
