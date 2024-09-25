@@ -63,12 +63,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<TokenBlacklistMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<TokenBlacklistMiddleware>();
 
 app.MapControllers();
 

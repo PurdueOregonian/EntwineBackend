@@ -1,17 +1,17 @@
 ﻿using Friends5___Backend.Authentication;
 using Microsoft.AspNetCore.Identity;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace Friends5___Backend.Services
 {
     public class AuthService : IAuthService
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly TokenBlacklist _tokenBlacklist = new();
+        private readonly TokenBlacklist _tokenBlacklist;
 
-        public AuthService(UserManager<IdentityUser> userManager)
+        public AuthService(UserManager<IdentityUser> userManager, TokenBlacklist tokenBlacklist)
         {
             _userManager = userManager;
+            _tokenBlacklist = tokenBlacklist;
         }
         public async Task<IdentityResult> RegisterUser(LoginInfo loginInfo)
         {
