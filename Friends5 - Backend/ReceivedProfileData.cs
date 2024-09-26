@@ -2,10 +2,8 @@
 
 namespace Friends5___Backend
 {
-    public class ProfileData
+    public class ReceivedProfileData
     {
-        [Key]
-        public string Username { get; set; }
         public string Name { get; set; }
         public string Interest { get; set; }
     }
