@@ -55,7 +55,13 @@ namespace Friends5___Backend.Controllers
             return BadRequest(registerResult.Errors.First().Description);
         }
 
-        
+        [HttpPost("Refresh")]
+        public IActionResult Refresh()
+        {
+            //TODO refresh the token
+        }
+
+
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
@@ -66,7 +72,6 @@ namespace Friends5___Backend.Controllers
                 return BadRequest("Token not provided.");
             }
 
-            // Call your AuthService to handle the logout process
             _authService.Logout(token);
 
             return Ok(new { message = "Logged out successfully" });
