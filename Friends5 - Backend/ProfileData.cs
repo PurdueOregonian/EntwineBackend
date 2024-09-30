@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Friends5___Backend
 {
+    [Index(nameof(Username), IsUnique = true)]
     public class ProfileData
     {
         [Key]
