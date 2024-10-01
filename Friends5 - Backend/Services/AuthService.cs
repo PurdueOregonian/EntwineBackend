@@ -1,5 +1,10 @@
 ﻿using Friends5___Backend.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Friends5___Backend.Services
 {
@@ -7,11 +12,15 @@ namespace Friends5___Backend.Services
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly TokenBlacklist _tokenBlacklist;
+        private readonly IConfiguration _config;
+        private readonly SymmetricSecurityKey _key;
 
-        public AuthService(UserManager<IdentityUser> userManager, TokenBlacklist tokenBlacklist)
+        public AuthService(IConfiguration config, UserManager<IdentityUser> userManager, TokenBlacklist tokenBlacklist)
         {
+            _config = config;
             _userManager = userManager;
             _tokenBlacklist = tokenBlacklist;
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetValue<string>("Jwt:Key")!));
         }
         public async Task<IdentityResult> RegisterUser(LoginInfo loginInfo)
         {
@@ -50,6 +59,59 @@ namespace Friends5___Backend.Services
         public void Logout(string token)
         {
             _tokenBlacklist.AddToken(token);
+        }
+
+        public string GenerateJwtToken(string username)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, username)
+            };
+
+            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.Now.AddMinutes(30); // Token expiration time
+
+            var token = new JwtSecurityToken(
+                _config.GetValue<string>("Jwt:Issuer"),
+                _config.GetValue<string>("Jwt:Audience"),
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+
+        }
+
+        public ClaimsPrincipal? ValidateRefreshToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = _key,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                if (validatedToken is JwtSecurityToken jwtToken && jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512))
+                {
+                    return principal;
+                }
+            }
+            catch
+            {
+                // Invalid token
+            }
+
+            return null;
         }
     }
 }
