@@ -2,8 +2,7 @@
 {
     public class LoginResult
     {
-        public bool Success { get; set; }
-        // Set if unexpected exception
-        public string? ErrorMessage { get; set; }
+        public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
     }
 }

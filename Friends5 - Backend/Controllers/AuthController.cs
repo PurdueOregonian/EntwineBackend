@@ -27,8 +27,13 @@ namespace Friends5___Backend.Controllers
             var loginResult = await _authService.Login(info);
             if (loginResult.Success)
             {
-                var tokenString = _authService.GenerateJwtToken(info.Username);
-                return Ok(tokenString);
+                var accessToken = _authService.GenerateJwtToken(info.Username, DateTime.Now.AddMinutes(30));
+                var refreshToken = _authService.GenerateJwtToken(info.Username, DateTime.Now.AddDays(1));
+                return Ok(new LoginResult
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken
+                });
             }
             if (loginResult.ErrorMessage != null)
             {
@@ -65,7 +70,7 @@ namespace Friends5___Backend.Controllers
 
             var claims = principal.Claims.ToArray();
 
-            var newAccessToken = _authService.GenerateJwtToken(User.Identity.Name);
+            var newAccessToken = _authService.GenerateJwtToken(User.Identity.Name, DateTime.Now.AddMinutes(30));
 
             return Ok(new { AccessToken = newAccessToken });
         }

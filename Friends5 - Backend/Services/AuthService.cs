@@ -39,20 +39,20 @@ namespace Friends5___Backend.Services
                 return IdentityResult.Failed(new IdentityError { Code = "CustomErrorCode", Description = "An error occurred while creating the user." });
             }
         }
-        public async Task<LoginResult> Login(LoginInfo loginInfo)
+        public async Task<SuccessAndErrorMessage> Login(LoginInfo loginInfo)
         {
             try
             {
                 var user = await _userManager.FindByNameAsync(loginInfo.Username);
                 if (user == null)
                 {
-                    return new LoginResult { Success = false };
+                    return new SuccessAndErrorMessage { Success = false };
                 }
-                return new LoginResult { Success = await _userManager.CheckPasswordAsync(user, loginInfo.Password) };
+                return new SuccessAndErrorMessage { Success = await _userManager.CheckPasswordAsync(user, loginInfo.Password) };
             }
             catch(Exception ex)
             {
-                return new LoginResult { Success = false, ErrorMessage = ex.Message };
+                return new SuccessAndErrorMessage { Success = false, ErrorMessage = ex.Message };
             }
         }
 
@@ -61,7 +61,7 @@ namespace Friends5___Backend.Services
             _tokenBlacklist.AddToken(token);
         }
 
-        public string GenerateJwtToken(string username)
+        public string GenerateJwtToken(string username, DateTime expirationTime)
         {
             var claims = new List<Claim>
             {
@@ -69,13 +69,12 @@ namespace Friends5___Backend.Services
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.Now.AddMinutes(30); // Token expiration time
 
             var token = new JwtSecurityToken(
                 _config.GetValue<string>("Jwt:Issuer"),
                 _config.GetValue<string>("Jwt:Audience"),
                 claims,
-                expires: expires,
+                expires: expirationTime,
                 signingCredentials: creds
             );
 
