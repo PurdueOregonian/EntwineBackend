@@ -29,10 +29,16 @@ namespace Friends5___Backend.Controllers
             {
                 var accessToken = _authService.GenerateJwtToken(info.Username, DateTime.Now.AddMinutes(30));
                 var refreshToken = _authService.GenerateJwtToken(info.Username, DateTime.Now.AddDays(1));
+                Response.Cookies.Append("refresh", refreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    // SameSite = SameSiteMode.Strict, //TODO make this work
+                    Expires = DateTimeOffset.UtcNow.AddHours(1)
+                });
                 return Ok(new LoginResult
                 {
-                    AccessToken = accessToken,
-                    RefreshToken = refreshToken
+                    AccessToken = accessToken
                 });
             }
             if (loginResult.ErrorMessage != null)
@@ -54,23 +60,22 @@ namespace Friends5___Backend.Controllers
             return BadRequest(registerResult.Errors.First().Description);
         }
 
+        [AllowAnonymous]
         [HttpPost("Refresh")]
         public IActionResult Refresh()
         {
-            var refreshToken = Request.Cookies["RefreshToken"];
-            if (refreshToken == null || User?.Identity?.Name is null)
+            var refreshToken = Request.Cookies["refresh"];
+            if (refreshToken == null)
             {
                 return Unauthorized("No refresh token or no username");
             }
             var principal = _authService.ValidateRefreshToken(refreshToken);
-            if (principal == null)
+            if (principal?.Identity?.Name == null)
             {
                 return Unauthorized("Invalid refresh token");
             }
-
-            var claims = principal.Claims.ToArray();
-
-            var newAccessToken = _authService.GenerateJwtToken(User.Identity.Name, DateTime.Now.AddMinutes(30));
+            var username = principal.Identity.Name;
+            var newAccessToken = _authService.GenerateJwtToken(username, DateTime.Now.AddMinutes(30));
 
             return Ok(new { AccessToken = newAccessToken });
         }

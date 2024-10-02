@@ -81,11 +81,6 @@ namespace Friends5___Backend.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public string GenerateRefreshToken()
-        {
-
-        }
-
         public ClaimsPrincipal? ValidateRefreshToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();

@@ -12,6 +12,5 @@ namespace Friends5___Backend.Services
         public void Logout(string token);
         public string GenerateJwtToken(string username, DateTime expirationTime);
         public ClaimsPrincipal ValidateRefreshToken(string token);
-        public string GenerateRefreshToken();
     }
 }
