@@ -33,8 +33,8 @@ namespace Friends5___Backend.Controllers
                 {
                     HttpOnly = true,
                     Secure = true,
-                    // SameSite = SameSiteMode.Strict, //TODO make this work
-                    Expires = DateTimeOffset.UtcNow.AddHours(1)
+                    SameSite = SameSiteMode.None, //TODO make this work
+                    Expires = DateTime.Now.AddDays(1)
                 });
                 return Ok(new LoginResult
                 {

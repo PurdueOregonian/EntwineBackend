@@ -68,7 +68,7 @@ namespace Friends5___Backend.Services
                 new Claim(ClaimTypes.Name, username)
             };
 
-            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
+            var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256); //TODO can 512 work?
 
             var token = new JwtSecurityToken(
                 _config.GetValue<string>("Jwt:Issuer"),
@@ -95,7 +95,7 @@ namespace Friends5___Backend.Services
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
-                if (validatedToken is JwtSecurityToken jwtToken && jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512))
+                if (validatedToken is JwtSecurityToken jwtToken && jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256))
                 {
                     return principal;
                 }
