@@ -1,6 +1,5 @@
 ﻿using Friends5___Backend.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -56,7 +55,7 @@ namespace Friends5___Backend.Services
             }
         }
 
-        public void Logout(string token)
+        public void InvalidateToken(string token)
         {
             _tokenBlacklist.AddToken(token);
         }
@@ -83,6 +82,10 @@ namespace Friends5___Backend.Services
 
         public ClaimsPrincipal? ValidateRefreshToken(string token)
         {
+            if (!_tokenBlacklist.IsTokenValid(token))
+            {
+                return null;
+            }
             var tokenHandler = new JwtSecurityTokenHandler();
             try
             {

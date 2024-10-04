@@ -77,13 +77,14 @@ namespace Friends5___Backend.Controllers
             var username = principal.Identity.Name;
             var newAccessToken = _authService.GenerateJwtToken(username, DateTime.Now.AddMinutes(30));
 
-            return Ok(new { AccessToken = newAccessToken });
+            return Ok(new RefreshResult { Username = username, AccessToken = newAccessToken });
         }
 
 
         [HttpPost("Logout")]
         public IActionResult Logout()
         {
+            var refreshToken = Request.Cookies["refresh"];
             var token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
             if (string.IsNullOrEmpty(token))
@@ -91,7 +92,11 @@ namespace Friends5___Backend.Controllers
                 return BadRequest("Token not provided.");
             }
 
-            _authService.Logout(token);
+            _authService.InvalidateToken(token);
+            if (refreshToken != null)
+            {
+                _authService.InvalidateToken(refreshToken);
+            }
 
             return Ok(new { message = "Logged out successfully" });
         }
