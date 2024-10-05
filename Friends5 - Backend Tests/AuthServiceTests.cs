@@ -26,7 +26,14 @@ namespace Friends5___Backend_Tests
         private readonly TokenBlacklist tokenBlacklist = new TokenBlacklist();
 
         public AuthServiceTests() {
-            _authService = new AuthService(_configuration.Object, _userManager.Object, tokenBlacklist);
+            var inMemorySettings = new Dictionary<string, string?> {
+                {"Jwt:Key", "SomeFakeKey"}
+            };
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(inMemorySettings)
+                .Build();
+
+            _authService = new AuthService(configuration, _userManager.Object, tokenBlacklist);
         }
 
         [Fact]
