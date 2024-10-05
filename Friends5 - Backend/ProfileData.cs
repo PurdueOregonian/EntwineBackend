@@ -7,8 +7,8 @@ namespace Friends5___Backend
     public class ProfileData
     {
         [Key]
-        public string Username { get; set; }
-        public string Name { get; set; }
-        public string Interest { get; set; }
+        public string? Username { get; set; }
+        public string? Name { get; set; }
+        public string? Interest { get; set; }
     }
 }

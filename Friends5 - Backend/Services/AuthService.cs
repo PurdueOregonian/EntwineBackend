@@ -21,7 +21,7 @@ namespace Friends5___Backend.Services
             _tokenBlacklist = tokenBlacklist;
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetValue<string>("Jwt:Key")!));
         }
-        public async Task<IdentityResult> RegisterUser(LoginInfo loginInfo)
+        public async Task<IdentityResult> RegisterUser(ValidLoginInfo loginInfo)
         {
             var identityUser = new IdentityUser
             {
@@ -38,7 +38,7 @@ namespace Friends5___Backend.Services
                 return IdentityResult.Failed(new IdentityError { Code = "CustomErrorCode", Description = "An error occurred while creating the user." });
             }
         }
-        public async Task<SuccessAndErrorMessage> Login(LoginInfo loginInfo)
+        public async Task<SuccessAndErrorMessage> Login(ValidLoginInfo loginInfo)
         {
             try
             {

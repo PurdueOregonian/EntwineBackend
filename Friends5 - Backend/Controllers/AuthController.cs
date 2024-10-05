@@ -24,7 +24,16 @@ namespace Friends5___Backend.Controllers
             {
                 return BadRequest();
             }
-            var loginResult = await _authService.Login(info);
+            if(info.Username is null || info.Password is null)
+            {
+                return BadRequest("Username or password is null.");
+            }
+            var validLoginInfo = new ValidLoginInfo
+            {
+                Username = info.Username,
+                Password = info.Password
+            };
+            var loginResult = await _authService.Login(validLoginInfo);
             if (loginResult.Success)
             {
                 var accessToken = _authService.GenerateJwtToken(info.Username, DateTime.Now.AddMinutes(30));
@@ -52,7 +61,16 @@ namespace Friends5___Backend.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterUser([FromBody] LoginInfo info)
         {
-            var registerResult = await _authService.RegisterUser(info);
+            if(info.Username is null || info.Password is null)
+            {
+                return BadRequest("Username or password is null.");
+            }
+            var validLoginInfo = new ValidLoginInfo
+            {
+                Username = info.Username,
+                Password = info.Password,
+            };
+            var registerResult = await _authService.RegisterUser(validLoginInfo);
             if(registerResult.Succeeded)
             {
                 return Ok();

@@ -46,8 +46,10 @@ namespace Friends5___Backend.Controllers
                 {
                     await cmd.ExecuteNonQueryAsync();
                 }
-                catch (Exception ex)
-                { }
+                catch (Exception)
+                {
+                    return StatusCode(500);
+                }
             }
             return Ok();
         }

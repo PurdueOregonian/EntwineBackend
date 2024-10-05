@@ -1,18 +1,32 @@
 ﻿using Friends5___Backend.Authentication;
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Friends5___Backend_Tests
 {
     public class AuthServiceTests
     {
-        private readonly Mock<UserManager<IdentityUser>> _userManager = new(Mock.Of<IUserStore<IdentityUser>>(), null, null, null, null, null, null, null, null);
+        private readonly Mock<IConfiguration> _configuration = new();
+        private readonly Mock<UserManager<IdentityUser>> _userManager = new Mock<UserManager<IdentityUser>>(
+            new Mock<IUserStore<IdentityUser>>().Object,
+            new Mock<IOptions<IdentityOptions>>().Object,
+            new Mock<IPasswordHasher<IdentityUser>>().Object,
+            new IUserValidator<IdentityUser>[0],
+            new IPasswordValidator<IdentityUser>[0],
+            new Mock<ILookupNormalizer>().Object,
+            new Mock<IdentityErrorDescriber>().Object,
+            new Mock<IServiceProvider>().Object,
+            new Mock<ILogger<UserManager<IdentityUser>>>().Object);
         private readonly AuthService _authService;
-        private readonly LoginInfo loginInfo = new LoginInfo { Username = "legit", Password = "legitPassword" };
+        private readonly ValidLoginInfo loginInfo = new ValidLoginInfo { Username = "legit", Password = "legitPassword" };
+        private readonly TokenBlacklist tokenBlacklist = new TokenBlacklist();
 
         public AuthServiceTests() {
-            _authService = new AuthService(_userManager.Object);
+            _authService = new AuthService(_configuration.Object, _userManager.Object, tokenBlacklist);
         }
 
         [Fact]
