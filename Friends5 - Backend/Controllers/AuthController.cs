@@ -85,12 +85,12 @@ namespace Friends5___Backend.Controllers
             var refreshToken = Request.Cookies["refresh"];
             if (refreshToken == null)
             {
-                return Unauthorized("No refresh token or no username");
+                return NoContent();
             }
             var principal = _authService.ValidateRefreshToken(refreshToken);
             if (principal?.Identity?.Name == null)
             {
-                return Unauthorized("Invalid refresh token");
+                return NoContent();
             }
             var username = principal.Identity.Name;
             var newAccessToken = _authService.GenerateJwtToken(username, DateTime.Now.AddMinutes(30));
@@ -115,6 +115,14 @@ namespace Friends5___Backend.Controllers
             {
                 _authService.InvalidateToken(refreshToken);
             }
+
+            Response.Cookies.Append("refresh", "", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None, //TODO make this work
+                Expires = DateTime.Now.AddDays(-1)
+            });
 
             return Ok(new { message = "Logged out successfully" });
         }
