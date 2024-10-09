@@ -74,3 +74,8 @@ app.UseMiddleware<TokenBlacklistMiddleware>();
 app.MapControllers();
 
 app.Run();
+
+// Just so it's visible to tests
+public partial class Program
+{
+}

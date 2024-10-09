@@ -33,7 +33,7 @@ namespace Friends5___Backend.Services
                 var result = await _userManager.CreateAsync(identityUser, loginInfo.Password);
                 return result;
             }
-            catch (Exception)
+            catch (Exception e) //TODO remove
             {
                 return IdentityResult.Failed(new IdentityError { Code = "CustomErrorCode", Description = "An error occurred while creating the user." });
             }
