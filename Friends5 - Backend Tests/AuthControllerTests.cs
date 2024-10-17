@@ -4,30 +4,13 @@ using System.Text.Json;
 
 namespace Friends5___Backend_Tests
 {
-    public class AuthControllerTests : IClassFixture<TestProgram>, IAsyncLifetime
+    public class AuthControllerTests : IClassFixture<TestProgram>
     {
         private readonly HttpClient _client;
 
         public AuthControllerTests(TestProgram factory)
         {
             _client = factory.Client;
-        }
-
-        public async Task InitializeAsync()
-        {
-            var loginInfo = new LoginInfo { Username = "SomeUsername", Password = "SomePassword5@" };
-            var json = JsonSerializer.Serialize(loginInfo);
-            var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            var requestUrl = "/Auth/Register";
-
-            var response = await _client.PostAsync(requestUrl, httpContent);
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        public Task DisposeAsync()
-        {
-            return Task.CompletedTask;
         }
 
         [Fact]
