@@ -4,7 +4,7 @@ namespace Friends5___Backend
 {
     public class ReceivedProfileData
     {
-        public string Name { get; set; }
-        public string Interest { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
+        public string? Gender { get; set; }
     }
 }

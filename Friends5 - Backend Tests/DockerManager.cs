@@ -29,7 +29,7 @@ namespace Friends5___Backend_Tests
                 {
                     { "5432/tcp", new List<PortBinding> { new PortBinding { HostPort = "5433" } } }
                 },
-                    Binds = new List<string> { "C:/Users/dellG5/Desktop/schema_dump.sql:/docker-entrypoint-initdb.d/schema_dump.sql" }
+                    Binds = new List<string> { "C:/Users/william/Desktop/schema_dump.sql:/docker-entrypoint-initdb.d/schema_dump.sql" }
                 }
             };
 

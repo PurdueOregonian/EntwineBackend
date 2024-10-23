@@ -32,16 +32,22 @@ namespace Friends5___Backend.Controllers
             var username = User.Identity.Name.ToString();
 
             await using (var cmd = dataSource.CreateCommand(@"
-                INSERT INTO public.profiles(""Name"", ""Interest"", ""Username"")
-                VALUES (@Name, @Interest, @Username)
+                INSERT INTO public.profiles(""Username"", ""DateOfBirth"", ""Gender"")
+                VALUES (@Username, @DateOfBirth, @Gender)
                 ON CONFLICT (""Username"") 
                 DO UPDATE 
-                SET ""Name"" = EXCLUDED.""Name"", ""Interest"" = EXCLUDED.""Interest"";
+                SET ""DateOfBirth"" = EXCLUDED.""DateOfBirth"", ""Gender"" = EXCLUDED.""Gender"";
             "))
             {
-                cmd.Parameters.AddWithValue("@Name", data.Name);
-                cmd.Parameters.AddWithValue("@Interest", data.Interest);
                 cmd.Parameters.AddWithValue("@Username", User.Identity.Name);
+                if (data.DateOfBirth is not null)
+                {
+                    cmd.Parameters.AddWithValue("@DateOfBirth", data.DateOfBirth);
+                }
+                if (data.Gender is not null)
+                {
+                    cmd.Parameters.AddWithValue("@Gender", data.Gender);
+                }
                 try
                 {
                     await cmd.ExecuteNonQueryAsync();
