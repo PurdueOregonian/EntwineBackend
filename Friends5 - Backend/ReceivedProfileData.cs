@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Friends5___Backend
+﻿namespace Friends5___Backend
 {
     public class ReceivedProfileData
     {

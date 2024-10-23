@@ -200,14 +200,14 @@ ALTER TABLE public."__EFMigrationsHistory" OWNER TO postgres;
 -- Name: profiles; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.profiles (
+CREATE TABLE public."Profiles" (
     "Name" text,
     "Interest" text,
     "Username" text
 );
 
 
-ALTER TABLE public.profiles OWNER TO postgres;
+ALTER TABLE public."Profiles" OWNER TO postgres;
 
 --
 -- Name: AspNetRoleClaims PK_AspNetRoleClaims; Type: CONSTRAINT; Schema: public; Owner: postgres
@@ -285,7 +285,7 @@ ALTER TABLE ONLY public."__EFMigrationsHistory"
 -- Name: profiles profiles_username_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.profiles
+ALTER TABLE ONLY public."Profiles"
     ADD CONSTRAINT profiles_username_unique UNIQUE ("Username");
 
 

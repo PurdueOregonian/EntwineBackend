@@ -32,7 +32,7 @@ namespace Friends5___Backend.Controllers
             var username = User.Identity.Name.ToString();
 
             await using (var cmd = dataSource.CreateCommand(@"
-                INSERT INTO public.profiles(""Username"", ""DateOfBirth"", ""Gender"")
+                INSERT INTO public.""Profiles""(""Username"", ""DateOfBirth"", ""Gender"")
                 VALUES (@Username, @DateOfBirth, @Gender)
                 ON CONFLICT (""Username"") 
                 DO UPDATE 
@@ -52,7 +52,7 @@ namespace Friends5___Backend.Controllers
                 {
                     await cmd.ExecuteNonQueryAsync();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     return StatusCode(500);
                 }
