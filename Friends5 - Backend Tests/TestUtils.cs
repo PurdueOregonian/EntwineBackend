@@ -11,7 +11,7 @@ namespace Friends5___Backend_Tests
         public static async Task LoginAsUser(HttpClient client, string username)
         {
             var loginInfo = new LoginInfo { Username = username, Password = "SomePassword5@" };
-            var json = JsonSerializer.Serialize(loginInfo);
+            var json = JsonSerializer.Serialize(loginInfo, DefaultJsonOptions.Instance);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
             var requestUrl = "/Auth/Login";
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
+using System.Data;
 
 namespace Friends5___Backend.Controllers
 {
@@ -45,7 +46,7 @@ namespace Friends5___Backend.Controllers
                 {
                     Username = reader.GetString(0),
                     DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(1)),
-                    Gender = reader.GetString(2)
+                    Gender = (Gender)reader.GetInt32(2)
                 };
                 return Ok(profile);
             }
@@ -83,7 +84,7 @@ namespace Friends5___Backend.Controllers
                 }
                 if (data.Gender is not null)
                 {
-                    cmd.Parameters.AddWithValue("@Gender", data.Gender);
+                    cmd.Parameters.AddWithValue("@Gender", (int)data.Gender);
                 }
                 try
                 {

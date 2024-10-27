@@ -9,6 +9,6 @@ namespace Friends5___Backend
         [Key]
         public string? Username { get; set; }
         public DateOnly? DateOfBirth { get; set; }
-        public string? Gender { get; set; }
+        public Gender? Gender { get; set; }
     }
 }

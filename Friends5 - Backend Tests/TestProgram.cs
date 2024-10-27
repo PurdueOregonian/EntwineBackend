@@ -1,4 +1,5 @@
-﻿using Friends5___Backend.Authentication;
+﻿using Friends5___Backend;
+using Friends5___Backend.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Text.Json;
@@ -31,7 +32,7 @@ namespace Friends5___Backend_Tests
             for(var i = 1; i <= 5; i++)
             {
                 var loginInfo = new LoginInfo { Username = $"SomeUsername{i}", Password = "SomePassword5@" };
-                var json = JsonSerializer.Serialize(loginInfo);
+                var json = JsonSerializer.Serialize(loginInfo, DefaultJsonOptions.Instance);
                 var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
                 var response = await _client.PostAsync(requestUrl, httpContent);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);

@@ -3,6 +3,6 @@
     public class ReceivedProfileData
     {
         public DateOnly? DateOfBirth { get; set; }
-        public string? Gender { get; set; }
+        public Gender? Gender { get; set; }
     }
 }

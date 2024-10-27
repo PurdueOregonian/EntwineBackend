@@ -53,7 +53,7 @@ namespace Friends5___Backend.Controllers
 
             if (data.Gender != null && data.Gender.Count > 0)
             {
-                command.Parameters.AddWithValue("@Gender", NpgsqlDbType.Array | NpgsqlDbType.Text, data.Gender.ToArray());
+                command.Parameters.AddWithValue("@Gender", NpgsqlDbType.Array | NpgsqlDbType.Integer, data.Gender.Select(g => (int)g).ToArray());
             }
             var username = User.Identity.Name.ToString();
 
@@ -64,7 +64,7 @@ namespace Friends5___Backend.Controllers
                 {
                     Username = reader.GetString(0),
                     DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(1)),
-                    Gender = reader.GetString(2)
+                    Gender = (Gender)reader.GetInt32(2)
                 };
                 if (profile.Username != username)
                 {

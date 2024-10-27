@@ -163,7 +163,7 @@ ALTER TABLE public."AspNetUsers" OWNER TO postgres;
 CREATE TABLE public."Profiles" (
     "Username" text NOT NULL,
     "DateOfBirth" date,
-    "Gender" text
+    "Gender" integer
 );
 
 

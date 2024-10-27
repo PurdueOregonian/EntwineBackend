@@ -1,4 +1,5 @@
-﻿using Friends5___Backend.Authentication;
+﻿using Friends5___Backend;
+using Friends5___Backend.Authentication;
 using System.Net;
 using System.Text.Json;
 
@@ -18,7 +19,7 @@ namespace Friends5___Backend_Tests
         public async Task Login()
         {
             var loginInfo = new LoginInfo { Username = "SomeUsername1", Password = "SomePassword5@" };
-            var json = JsonSerializer.Serialize(loginInfo);
+            var json = JsonSerializer.Serialize(loginInfo, DefaultJsonOptions.Instance);
             var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             var requestUrl = "/Auth/Login";
 
@@ -35,7 +36,7 @@ namespace Friends5___Backend_Tests
         public async Task Login_UsernameOrPasswordNullOrIncorrect(string? username, string? password)
         {
             var loginInfo = new LoginInfo { Username = username, Password = password };
-            var json = JsonSerializer.Serialize(loginInfo);
+            var json = JsonSerializer.Serialize(loginInfo, DefaultJsonOptions.Instance);
             var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             var requestUrl = "/Auth/Login";
 

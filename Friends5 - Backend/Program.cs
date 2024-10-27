@@ -1,3 +1,4 @@
+using Friends5___Backend;
 using Friends5___Backend.Authentication;
 using Friends5___Backend.DbContext;
 using Friends5___Backend.Services;
@@ -11,7 +12,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // TODO just use the DefaultJsonOptions.Instance
+        var defaultOptions = DefaultJsonOptions.Instance;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = defaultOptions.PropertyNameCaseInsensitive;
+        foreach (var converter in defaultOptions.Converters)
+        {
+            options.JsonSerializerOptions.Converters.Add(converter);
+        }
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
