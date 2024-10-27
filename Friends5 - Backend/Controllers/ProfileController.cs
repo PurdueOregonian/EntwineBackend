@@ -18,6 +18,43 @@ namespace Friends5___Backend.Controllers
             _config = config;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetProfileAsync()
+        {
+            if (User.Identity?.Name is null)
+            {
+                return Unauthorized();
+            }
+
+            var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
+            await using var dataSource = NpgsqlDataSource.Create(connectionString);
+
+            var username = User.Identity.Name.ToString();
+
+            var sql = @"SELECT * FROM public.""Profiles""
+                        WHERE ""Profiles"".""Username"" = @Username";
+
+            using var command = dataSource.CreateCommand(sql);
+
+            command.Parameters.AddWithValue("@Username", username);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var profile = new ProfileData
+                {
+                    Username = reader.GetString(0),
+                    DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(1)),
+                    Gender = reader.GetString(2)
+                };
+                return Ok(profile);
+            }
+            else
+            {
+                return Ok(new ProfileData());
+            }
+        }
+
         [HttpPost("Save")]
         public async Task<IActionResult> SaveProfileAsync([FromBody] ReceivedProfileData data)
         {
