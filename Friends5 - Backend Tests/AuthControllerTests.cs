@@ -16,7 +16,7 @@ namespace Friends5___Backend_Tests
         [Fact]
         public async Task Login()
         {
-            var loginInfo = new LoginInfo { Username = "SomeUsername", Password = "SomePassword5@" };
+            var loginInfo = new LoginInfo { Username = "SomeUsername1", Password = "SomePassword5@" };
             var json = JsonSerializer.Serialize(loginInfo);
             var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             var requestUrl = "/Auth/Login";
@@ -28,9 +28,9 @@ namespace Friends5___Backend_Tests
 
         [Theory]
         [InlineData(null, "SomePassword5@")]
-        [InlineData("SomeUsername", null)]
+        [InlineData("SomeUsername1", null)]
         [InlineData("SomeWrongUsername", "SomePassword5@")]
-        [InlineData("SomeUsername", "SomeWrongPassword5@")]
+        [InlineData("SomeUsername1", "SomeWrongPassword5@")]
         public async Task Login_UsernameOrPasswordNullOrIncorrect(string? username, string? password)
         {
             var loginInfo = new LoginInfo { Username = username, Password = password };

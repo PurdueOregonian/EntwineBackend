@@ -55,16 +55,21 @@ namespace Friends5___Backend.Controllers
             {
                 command.Parameters.AddWithValue("@Gender", NpgsqlDbType.Array | NpgsqlDbType.Text, data.Gender.ToArray());
             }
+            var username = User.Identity.Name.ToString();
 
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                profiles.Add(new ProfileData
+                var profile = new ProfileData
                 {
                     Username = reader.GetString(0),
                     DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(1)),
                     Gender = reader.GetString(2)
-                });
+                };
+                if (profile.Username != username)
+                {
+                    profiles.Add(profile);
+                }
             }
             return Ok(profiles);
         }

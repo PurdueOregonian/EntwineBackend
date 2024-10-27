@@ -22,7 +22,7 @@ namespace Friends5___Backend_Tests
             {
                 Image = "postgres:latest",
                 Name = "test-instance",
-                Env = new[] { $"POSTGRES_PASSWORD={password}" },
+                Env = [$"POSTGRES_PASSWORD={password}"],
                 HostConfig = new HostConfig
                 {
                     PortBindings = new Dictionary<string, IList<PortBinding>>

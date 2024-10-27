@@ -26,14 +26,17 @@ namespace Friends5___Backend_Tests
 
         public async Task InitializeAsync()
         {
-            var loginInfo = new LoginInfo { Username = "SomeUsername", Password = "SomePassword5@" };
-            var json = JsonSerializer.Serialize(loginInfo);
-            var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             var requestUrl = "/Auth/Register";
 
-            var response = await _client.PostAsync(requestUrl, httpContent);
+            for(var i = 1; i <= 5; i++)
+            {
+                var loginInfo = new LoginInfo { Username = $"SomeUsername{i}", Password = "SomePassword5@" };
+                var json = JsonSerializer.Serialize(loginInfo);
+                var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                var response = await _client.PostAsync(requestUrl, httpContent);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             await Task.CompletedTask;
         }
 
