@@ -4,7 +4,8 @@ using System.Text.Json;
 
 namespace Friends5___Backend_Tests
 {
-    public class AuthControllerTests : IClassFixture<TestProgram>
+    [Collection("TestProgram collection")]
+    public class AuthControllerTests
     {
         private readonly HttpClient _client;
 

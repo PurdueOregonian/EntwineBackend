@@ -1,11 +1,11 @@
 ﻿using Friends5___Backend;
-using Friends5___Backend.Authentication;
 using System.Net;
 using System.Text.Json;
 
 namespace Friends5___Backend_Tests
 {
-    public class ProfileSearchTests : IClassFixture<TestProgram>
+    [Collection("TestProgram collection")]
+    public class ProfileSearchTests
     {
         private readonly HttpClient _client;
 
