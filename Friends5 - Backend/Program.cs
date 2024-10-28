@@ -15,13 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        // TODO just use the DefaultJsonOptions.Instance
-        var defaultOptions = DefaultJsonOptions.Instance;
-        options.JsonSerializerOptions.PropertyNameCaseInsensitive = defaultOptions.PropertyNameCaseInsensitive;
-        foreach (var converter in defaultOptions.Converters)
-        {
-            options.JsonSerializerOptions.Converters.Add(converter);
-        }
+        DefaultJsonOptions.InitOptions(options.JsonSerializerOptions);
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
