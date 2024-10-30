@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
-using System.Data;
 
 namespace Friends5___Backend.Controllers
 {
@@ -20,7 +19,7 @@ namespace Friends5___Backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetProfileAsync()
+        public async Task<IActionResult> GetOwnProfileAsync()
         {
             if (User.Identity?.Name is null)
             {
@@ -28,32 +27,31 @@ namespace Friends5___Backend.Controllers
             }
 
             var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
-            await using var dataSource = NpgsqlDataSource.Create(connectionString);
-
             var username = User.Identity.Name.ToString();
 
-            var sql = @"SELECT * FROM public.""Profiles""
-                        WHERE ""Profiles"".""Username"" = @Username";
+            var profile = await GetProfile(connectionString, username);
 
-            using var command = dataSource.CreateCommand(sql);
+            return Ok(profile);
+        }
 
-            command.Parameters.AddWithValue("@Username", username);
-
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+        [HttpGet("{username}")]
+        public async Task<IActionResult> GetProfileAsync(string username)
+        {
+            if (User.Identity?.Name is null)
             {
-                var profile = new ProfileData
-                {
-                    Username = reader.GetString(0),
-                    DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(1)),
-                    Gender = (Gender)reader.GetInt32(2)
-                };
-                return Ok(profile);
+                return Unauthorized();
             }
-            else
+
+            var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
+
+            var profile = await GetProfile(connectionString, username);
+
+            var dataToReturn = new OtherProfileData
             {
-                return Ok(new ProfileData());
-            }
+                Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
+                Gender = profile.Gender
+            };
+            return Ok(dataToReturn);
         }
 
         [HttpPost("Save")]
@@ -96,6 +94,34 @@ namespace Friends5___Backend.Controllers
                 }
             }
             return Ok();
+        }
+
+        private async Task<ProfileData> GetProfile(string connectionString, string username)
+        {
+            await using var dataSource = NpgsqlDataSource.Create(connectionString);
+
+            var sql = @"SELECT * FROM public.""Profiles""
+                        WHERE ""Profiles"".""Username"" = @Username";
+
+            using var command = dataSource.CreateCommand(sql);
+
+            command.Parameters.AddWithValue("@Username", username);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var profile = new ProfileData
+                {
+                    Username = reader.GetString(0),
+                    DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(1)),
+                    Gender = (Gender)reader.GetInt32(2)
+                };
+                return profile;
+            }
+            else
+            {
+                return new ProfileData();
+            }
         }
     }
 }

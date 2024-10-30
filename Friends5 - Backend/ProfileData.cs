@@ -1,14 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-
-namespace Friends5___Backend
+﻿namespace Friends5___Backend
 {
-    [Index(nameof(Username), IsUnique = true)]
-    public class ProfileData
+    public class OtherProfileData
     {
-        [Key]
-        public string? Username { get; set; }
-        public DateOnly? DateOfBirth { get; set; }
+        public int? Age { get; set; }
         public Gender? Gender { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace Friends5___Backend_Tests
         {
             await TestUtils.LoginAsUser(_client, "SomeUsername1");
 
-            var profileInfo = new ReceivedProfileData { DateOfBirth = new DateOnly(2002, 1, 15), Gender = Gender.Male };
+            var profileInfo = new ReceivedProfileData { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-24)), Gender = Gender.Female };
             var json = JsonSerializer.Serialize(profileInfo, DefaultJsonOptions.Instance);
             var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
             var requestUrl = "/Profile/Save";
@@ -31,10 +31,20 @@ namespace Friends5___Backend_Tests
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseContent = await response.Content.ReadAsStringAsync();
             var profileData = JsonSerializer.Deserialize<ProfileData>(responseContent, DefaultJsonOptions.Instance);
-            Assert.Equal(2002, profileData!.DateOfBirth!.Value.Year);
-            Assert.Equal(1, profileData.DateOfBirth!.Value.Month);
-            Assert.Equal(15, profileData.DateOfBirth!.Value.Day);
-            Assert.Equal(Gender.Male, profileData.Gender);
+            Assert.Equal(DateTime.Now.Year - 24, profileData!.DateOfBirth!.Value.Year);
+            Assert.Equal(DateTime.Now.Month, profileData.DateOfBirth!.Value.Month);
+            Assert.Equal(DateTime.Now.Day, profileData.DateOfBirth!.Value.Day);
+            Assert.Equal(Gender.Female, profileData.Gender);
+
+            await TestUtils.LoginAsUser(_client, "SomeUsername2");
+
+            requestUrl = "/Profile/SomeUsername1";
+            response = await _client.GetAsync(requestUrl);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            responseContent = await response.Content.ReadAsStringAsync();
+            var otherProfileData = JsonSerializer.Deserialize<OtherProfileData>(responseContent, DefaultJsonOptions.Instance);
+            Assert.Equal(24, otherProfileData!.Age);
+            Assert.Equal(Gender.Female, otherProfileData.Gender);
         }
     }
 }
