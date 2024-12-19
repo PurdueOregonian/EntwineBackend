@@ -46,6 +46,11 @@ namespace Friends5___Backend.Controllers
 
             var profile = await GetProfile(connectionString, username);
 
+            if (profile == null)
+            {
+                return NotFound();
+            }
+
             var dataToReturn = new OtherProfileData
             {
                 Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
@@ -96,7 +101,7 @@ namespace Friends5___Backend.Controllers
             return Ok();
         }
 
-        private async Task<ProfileData> GetProfile(string connectionString, string username)
+        private async Task<ProfileData?> GetProfile(string connectionString, string username)
         {
             await using var dataSource = NpgsqlDataSource.Create(connectionString);
 
@@ -120,7 +125,7 @@ namespace Friends5___Backend.Controllers
             }
             else
             {
-                return new ProfileData();
+                return null;
             }
         }
     }
