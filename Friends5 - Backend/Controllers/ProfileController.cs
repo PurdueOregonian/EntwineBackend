@@ -31,6 +31,11 @@ namespace Friends5___Backend.Controllers
 
             var profile = await GetProfile(connectionString, username);
 
+            if (profile == null)
+            {
+                return NotFound();
+            }
+
             return Ok(profile);
         }
 
