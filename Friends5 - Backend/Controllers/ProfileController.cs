@@ -56,7 +56,7 @@ namespace Friends5___Backend.Controllers
                 return NotFound();
             }
 
-            var dataToReturn = new OtherProfileData
+            var dataToReturn = new ProfileSearchReturnData
             {
                 Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
                 Gender = profile.Gender

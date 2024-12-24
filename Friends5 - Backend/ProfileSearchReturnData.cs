@@ -1,6 +1,6 @@
 ﻿namespace Friends5___Backend
 {
-    public class OtherProfileData
+    public class ProfileSearchReturnData
     {
         public int? Age { get; set; }
         public Gender? Gender { get; set; }
