@@ -1,5 +1,6 @@
 ﻿using Friends5___Backend;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 
 namespace Friends5___Backend_Tests
@@ -15,19 +16,10 @@ namespace Friends5___Backend_Tests
         }
 
         [Fact]
-        public async Task SaveAndGet()
+        public async Task Get()
         {
-            await TestUtils.LoginAsUser(_client, "SomeUsername1");
-
-            var profileInfo = new ReceivedProfileData { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-24)), Gender = Gender.Female };
-            var json = JsonSerializer.Serialize(profileInfo, DefaultJsonOptions.Instance);
-            var httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            var requestUrl = "/Profile/Save";
-            var response = await _client.PostAsync(requestUrl, httpContent);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            requestUrl = "/Profile";
-            response = await _client.GetAsync(requestUrl);
+            var requestUrl = "/Profile";
+            var response = await _client.GetAsync(requestUrl);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseContent = await response.Content.ReadAsStringAsync();
             var profileData = JsonSerializer.Deserialize<ProfileData>(responseContent, DefaultJsonOptions.Instance);
@@ -45,6 +37,39 @@ namespace Friends5___Backend_Tests
             var otherProfileData = JsonSerializer.Deserialize<ProfileSearchReturnData>(responseContent, DefaultJsonOptions.Instance);
             Assert.Equal(24, otherProfileData!.Age);
             Assert.Equal(Gender.Female, otherProfileData.Gender);
+        }
+
+        [Fact]
+        public async Task Search()
+        {
+            await TestUtils.LoginAsUser(_client, "SomeUsername2");
+
+            var requestUrl = "/Search";
+            var content = new StringContent(JsonSerializer.Serialize(new
+            {
+                MinAge = 18,
+                MaxAge = 40,
+                Gender = new List<Gender> { Gender.Female }
+            }), Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync(requestUrl, content);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var searchResults = JsonSerializer.Deserialize<List<ProfileSearchReturnData>>(responseContent, DefaultJsonOptions.Instance);
+            Assert.NotNull(searchResults);
+            Assert.NotEmpty(searchResults);
+
+            content = new StringContent(JsonSerializer.Serialize(new
+            {
+                MinAge = 30,
+                MaxAge = 40,
+                Gender = new List<Gender> { Gender.Female }
+            }), Encoding.UTF8, "application/json");
+            response = await _client.PostAsync(requestUrl, content);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            responseContent = await response.Content.ReadAsStringAsync();
+            searchResults = JsonSerializer.Deserialize<List<ProfileSearchReturnData>>(responseContent, DefaultJsonOptions.Instance);
+            Assert.NotNull(searchResults);
+            Assert.Empty(searchResults);
         }
     }
 }
