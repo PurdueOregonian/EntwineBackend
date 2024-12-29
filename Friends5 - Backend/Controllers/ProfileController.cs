@@ -122,9 +122,10 @@ namespace Friends5___Backend.Controllers
             {
                 var profile = new ProfileData
                 {
-                    Username = reader.GetString(0),
-                    DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(1)),
-                    Gender = (Gender)reader.GetInt32(2)
+                    Id = reader.GetInt32(0),
+                    Username = reader.GetString(1),
+                    DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(2)),
+                    Gender = (Gender)reader.GetInt32(3)
                 };
                 return profile;
             }

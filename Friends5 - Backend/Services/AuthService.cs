@@ -1,4 +1,5 @@
 ﻿using Friends5___Backend.Authentication;
+using Friends5___Backend.UserId;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,12 +10,12 @@ namespace Friends5___Backend.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly TokenBlacklist _tokenBlacklist;
         private readonly IConfiguration _config;
         private readonly SymmetricSecurityKey _key;
 
-        public AuthService(IConfiguration config, UserManager<IdentityUser> userManager, TokenBlacklist tokenBlacklist)
+        public AuthService(IConfiguration config, UserManager<ApplicationUser> userManager, TokenBlacklist tokenBlacklist)
         {
             _config = config;
             _userManager = userManager;
@@ -23,35 +24,36 @@ namespace Friends5___Backend.Services
         }
         public async Task<IdentityResult> RegisterUser(ValidLoginInfo loginInfo)
         {
-            var identityUser = new IdentityUser
+            var applicationUser = new ApplicationUser
             {
                 UserName = loginInfo.Username
             };
 
             try
             {
-                var result = await _userManager.CreateAsync(identityUser, loginInfo.Password);
+                var result = await _userManager.CreateAsync(applicationUser, loginInfo.Password);
                 return result;
             }
-            catch
+            catch(Exception)
             {
                 return IdentityResult.Failed(new IdentityError { Code = "CustomErrorCode", Description = "An error occurred while creating the user." });
             }
         }
-        public async Task<SuccessAndErrorMessage> Login(ValidLoginInfo loginInfo)
+        public async Task<UserAndErrorMessage> Login(ValidLoginInfo loginInfo)
         {
             try
             {
                 var user = await _userManager.FindByNameAsync(loginInfo.Username);
                 if (user == null)
                 {
-                    return new SuccessAndErrorMessage { Success = false };
+                    return new UserAndErrorMessage();
                 }
-                return new SuccessAndErrorMessage { Success = await _userManager.CheckPasswordAsync(user, loginInfo.Password) };
+                var passwordValid = await _userManager.CheckPasswordAsync(user, loginInfo.Password);
+                return new UserAndErrorMessage { User = passwordValid ? user : null };
             }
             catch(Exception ex)
             {
-                return new SuccessAndErrorMessage { Success = false, ErrorMessage = ex.Message };
+                return new UserAndErrorMessage { ErrorMessage = ex.Message };
             }
         }
 
@@ -60,11 +62,12 @@ namespace Friends5___Backend.Services
             _tokenBlacklist.AddToken(token);
         }
 
-        public string GenerateJwtToken(string username, DateTime expirationTime)
+        public string GenerateJwtToken(ApplicationUser user, DateTime expirationTime)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, username)
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256); //TODO can 512 work?
@@ -109,6 +112,11 @@ namespace Friends5___Backend.Services
             }
 
             return null;
+        }
+
+        public ApplicationUser? GetUserFromName(string username)
+        {
+            return _userManager.FindByNameAsync(username).Result;
         }
     }
 }

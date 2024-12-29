@@ -7,7 +7,7 @@ namespace Friends5___Backend
     public class ProfileData
     {
         [Key]
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public string? Username { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public Gender? Gender { get; set; }

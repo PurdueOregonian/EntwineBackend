@@ -2,6 +2,7 @@ using Friends5___Backend;
 using Friends5___Backend.Authentication;
 using Friends5___Backend.DbContext;
 using Friends5___Backend.Services;
+using Friends5___Backend.UserId;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,7 @@ builder.Services.AddDbContext<FriendsDbContext>(options => {
     options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:DefaultConnection"));
 });
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<FriendsDbContext>()
     .AddDefaultTokenProviders();
 

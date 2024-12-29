@@ -1,13 +1,31 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Friends5___Backend.UserId;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Friends5___Backend.DbContext
 {
-    public class FriendsDbContext : IdentityDbContext<IdentityUser>
+    public class FriendsDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
-        public FriendsDbContext(DbContextOptions options): base(options) { }
+        public FriendsDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<ProfileData> Profiles { get; set; }
+        public DbSet<ApplicationUserLogin> ApplicationUserLogins { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUser>(entity =>
+            {
+                entity.ToTable("AspNetUsers");
+                entity.Property(l => l.Id)
+                .HasColumnType("int")
+                .IsRequired()
+                .ValueGeneratedOnAdd()
+                .UseIdentityColumn();
+
+                entity.HasKey(l => l.Id);
+            });
+        }
     }
 }

@@ -34,10 +34,10 @@ namespace Friends5___Backend.Controllers
                 Password = info.Password
             };
             var loginResult = await _authService.Login(validLoginInfo);
-            if (loginResult.Success)
+            if (loginResult.User != null)
             {
-                var accessToken = _authService.GenerateJwtToken(info.Username, DateTime.Now.AddMinutes(30));
-                var refreshToken = _authService.GenerateJwtToken(info.Username, DateTime.Now.AddDays(1));
+                var accessToken = _authService.GenerateJwtToken(loginResult.User, DateTime.Now.AddMinutes(30));
+                var refreshToken = _authService.GenerateJwtToken(loginResult.User, DateTime.Now.AddDays(1));
                 Response.Cookies.Append("refresh", refreshToken, new CookieOptions
                 {
                     HttpOnly = true,
@@ -93,7 +93,14 @@ namespace Friends5___Backend.Controllers
                 return NoContent();
             }
             var username = principal.Identity.Name;
-            var newAccessToken = _authService.GenerateJwtToken(username, DateTime.Now.AddMinutes(30));
+
+            var user = _authService.GetUserFromName(username);
+            if(user == null)
+            {
+                return NoContent();
+            }
+
+            var newAccessToken = _authService.GenerateJwtToken(user, DateTime.Now.AddMinutes(30));
 
             return Ok(new RefreshResult { Username = username, AccessToken = newAccessToken });
         }
