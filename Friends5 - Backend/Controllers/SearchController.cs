@@ -19,6 +19,48 @@ namespace Friends5___Backend.Controllers
             _config = config;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SearchUsers([FromQuery] string searchString)
+        {
+            if (User.Identity?.Name is null)
+            {
+                return Unauthorized();
+            }
+
+            if (string.IsNullOrWhiteSpace(searchString))
+            {
+                return BadRequest("Search string cannot be empty.");
+            }
+
+            var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
+            await using var dataSource = NpgsqlDataSource.Create(connectionString);
+
+            var users = new List<ProfileData>();
+
+            var sql = @"SELECT * FROM public.""AspNetUsers"" WHERE ""UserName"" ILIKE @SearchString";
+
+            using var command = dataSource.CreateCommand(sql);
+            command.Parameters.AddWithValue("@SearchString", $"%{searchString}%");
+
+            var username = User.Identity.Name.ToString();
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var user = new ProfileData
+                {
+                    Id = reader.GetInt32(0),
+                    Username = reader.GetString(1)
+                };
+                if (user.Username != username)
+                {
+                    users.Add(user);
+                }
+            }
+
+            return Ok(users);
+        }
+
         [HttpPost]
         public async Task<IActionResult> SearchProfilesAsync([FromBody] SearchProfileData data)
         {
