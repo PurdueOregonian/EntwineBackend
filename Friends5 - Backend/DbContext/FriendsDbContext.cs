@@ -1,4 +1,5 @@
-﻿using Friends5___Backend.UserId;
+﻿using Friends5___Backend.DbItems;
+using Friends5___Backend.UserId;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,8 @@ namespace Friends5___Backend.DbContext
         public FriendsDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<ProfileData> Profiles { get; set; }
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<Message> Messages { get; set; }
         public DbSet<ApplicationUserLogin> ApplicationUserLogins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

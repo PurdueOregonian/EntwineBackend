@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-namespace Friends5___Backend
+namespace Friends5___Backend.DbItems
 {
-    [Index(nameof(Username), IsUnique = true)]
+    [Index(nameof(Id), IsUnique = true)]
     public class ProfileData
     {
         [Key]
