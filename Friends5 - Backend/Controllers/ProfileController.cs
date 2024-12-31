@@ -1,4 +1,4 @@
-using Friends5___Backend.DbItems;
+using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Npgsql;
@@ -10,13 +10,15 @@ namespace Friends5___Backend.Controllers
     [Authorize]
     public class ProfileController : ControllerBase
     {
-        IConfiguration _config;
         private readonly ILogger<ProfileController> _logger;
+        private readonly IProfileService _profileService;
 
-        public ProfileController(ILogger<ProfileController> logger, IConfiguration config)
+        public ProfileController(
+            ILogger<ProfileController> logger,
+            IProfileService profileService)
         {
             _logger = logger;
-            _config = config;
+            _profileService = profileService;
         }
 
         [HttpGet]
@@ -27,10 +29,9 @@ namespace Friends5___Backend.Controllers
                 return Unauthorized();
             }
 
-            var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
             var username = User.Identity.Name.ToString();
 
-            var profile = await GetProfile(connectionString, username);
+            var profile = await _profileService.GetProfile(username);
 
             if (profile == null)
             {
@@ -48,9 +49,7 @@ namespace Friends5___Backend.Controllers
                 return Unauthorized();
             }
 
-            var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
-
-            var profile = await GetProfile(connectionString, username);
+            var profile = await _profileService.GetProfile(username);
 
             if (profile == null)
             {
@@ -72,68 +71,15 @@ namespace Friends5___Backend.Controllers
             {
                 return Unauthorized();
             }
-
-            var connectionString = _config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
-            await using var dataSource = NpgsqlDataSource.Create(connectionString);
-
-            var username = User.Identity.Name.ToString();
-
-            await using (var cmd = dataSource.CreateCommand(@"
-                INSERT INTO public.""Profiles""(""Username"", ""DateOfBirth"", ""Gender"")
-                VALUES (@Username, @DateOfBirth, @Gender)
-                ON CONFLICT (""Username"") 
-                DO UPDATE 
-                SET ""DateOfBirth"" = EXCLUDED.""DateOfBirth"", ""Gender"" = EXCLUDED.""Gender"";
-            "))
+            try
             {
-                cmd.Parameters.AddWithValue("@Username", User.Identity.Name);
-                if (data.DateOfBirth is not null)
-                {
-                    cmd.Parameters.AddWithValue("@DateOfBirth", data.DateOfBirth);
-                }
-                if (data.Gender is not null)
-                {
-                    cmd.Parameters.AddWithValue("@Gender", (int)data.Gender);
-                }
-                try
-                {
-                    await cmd.ExecuteNonQueryAsync();
-                }
-                catch (Exception e)
-                {
-                    return StatusCode(500);
-                }
+                await _profileService.SaveProfile(User.Identity.Name, data);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500);
             }
             return Ok();
-        }
-
-        private async Task<ProfileData?> GetProfile(string connectionString, string username)
-        {
-            await using var dataSource = NpgsqlDataSource.Create(connectionString);
-
-            var sql = @"SELECT * FROM public.""Profiles""
-                        WHERE ""Profiles"".""Username"" = @Username";
-
-            using var command = dataSource.CreateCommand(sql);
-
-            command.Parameters.AddWithValue("@Username", username);
-
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                var profile = new ProfileData
-                {
-                    Id = reader.GetInt32(0),
-                    Username = reader.GetString(1),
-                    DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(2)),
-                    Gender = (Gender)reader.GetInt32(3)
-                };
-                return profile;
-            }
-            else
-            {
-                return null;
-            }
         }
     }
 }
