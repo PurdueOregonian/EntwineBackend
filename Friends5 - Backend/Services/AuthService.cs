@@ -64,6 +64,7 @@ namespace Friends5___Backend.Services
 
         public string GenerateJwtToken(ApplicationUser user, DateTime expirationTime)
         {
+            // TODO don't need the whole user
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),

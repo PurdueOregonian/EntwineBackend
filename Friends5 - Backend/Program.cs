@@ -23,6 +23,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddSingleton<TokenBlacklist>();
 builder.Services.AddHttpClient();
 builder.Services.AddDbContext<FriendsDbContext>(options => {

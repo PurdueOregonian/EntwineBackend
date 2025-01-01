@@ -46,6 +46,7 @@ namespace Friends5___Backend.Controllers
                 });
                 return Ok(new LoginResult
                 {
+                    UserId = loginResult.User.Id,
                     AccessToken = accessToken
                 });
             }

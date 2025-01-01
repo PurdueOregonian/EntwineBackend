@@ -1,7 +1,6 @@
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
 
 namespace Friends5___Backend.Controllers
 {

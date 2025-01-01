@@ -1,9 +1,6 @@
-using Friends5___Backend.DbItems;
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
-using NpgsqlTypes;
 
 namespace Friends5___Backend.Controllers
 {
@@ -12,17 +9,11 @@ namespace Friends5___Backend.Controllers
     [Authorize]
     public class SearchController : ControllerBase
     {
-        IConfiguration _config;
-        private readonly ILogger<ProfileController> _logger;
         private readonly IProfileService _profileService;
 
         public SearchController(
-            ILogger<ProfileController> logger,
-            IConfiguration config,
             IProfileService profileService)
         {
-            _logger = logger;
-            _config = config;
             _profileService = profileService;
         }
 

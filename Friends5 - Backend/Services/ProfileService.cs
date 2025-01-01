@@ -141,5 +141,26 @@ namespace Friends5___Backend.Services
             }
             return profiles;
         }
+
+        public async Task<string?> GetUsernameFromId(int id)
+        {
+            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+
+            var sql = @"SELECT ""Username"" FROM public.""Profiles""
+                        WHERE ""Id"" = @Id";
+
+            using var command = dataSource.CreateCommand(sql);
+            command.Parameters.AddWithValue("@Id", id);
+
+            using var reader = await command.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                return reader.GetString(0);
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
