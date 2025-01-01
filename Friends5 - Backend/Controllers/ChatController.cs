@@ -117,5 +117,37 @@ namespace Friends5___Backend.Controllers
 
             return Ok(messages);
         }
+
+        [HttpPost("{chatId}/Messages")]
+        public async Task<IActionResult> SendMessage([FromRoute] int chatId, [FromBody] MessageToSend data)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            if(data.Content is null)
+            {
+                return BadRequest();
+            }
+
+            var chat = await _chatService.GetChat(chatId);
+            if (chat is null)
+            {
+                return NotFound();
+            }
+            if (chat.UserIds is null)
+            {
+                return StatusCode(500);
+            }
+            var userId = int.Parse(userIdClaim.Value);
+            if (!chat.UserIds.Contains(userId))
+            {
+                return NotFound();
+            }
+            var message = await _chatService.SendMessage(data);
+            return Ok(message);
+        }
     }
 }
