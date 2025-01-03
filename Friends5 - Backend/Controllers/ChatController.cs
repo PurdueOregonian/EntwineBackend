@@ -127,7 +127,7 @@ namespace Friends5___Backend.Controllers
                 return Unauthorized();
             }
 
-            if(data.Content is null)
+            if (data.Content is null)
             {
                 return BadRequest();
             }
@@ -146,7 +146,7 @@ namespace Friends5___Backend.Controllers
             {
                 return NotFound();
             }
-            var message = await _chatService.SendMessage(data);
+            var message = await _chatService.SendMessage(chatId, userId, data.Content);
             return Ok(message);
         }
     }

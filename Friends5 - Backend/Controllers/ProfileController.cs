@@ -1,6 +1,7 @@
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Friends5___Backend.Controllers
 {
@@ -66,13 +67,19 @@ namespace Friends5___Backend.Controllers
         [HttpPost("Save")]
         public async Task<IActionResult> SaveProfileAsync([FromBody] ReceivedProfileData data)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+            var userId = int.Parse(userIdClaim.Value);
             if (User.Identity?.Name is null)
             {
                 return Unauthorized();
             }
             try
             {
-                await _profileService.SaveProfile(User.Identity.Name, data);
+                await _profileService.SaveProfile(userId, User.Identity.Name, data);
             }
             catch (Exception e)
             {

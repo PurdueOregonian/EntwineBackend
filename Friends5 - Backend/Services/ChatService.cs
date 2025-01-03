@@ -112,16 +112,16 @@ namespace Friends5___Backend.Services
             return null;
         }
 
-        public async Task<Message?> SendMessage(MessageToSend message)
+        public async Task<Message?> SendMessage(int chatId, int senderId, string content)
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
             var sql = @"INSERT INTO public.""Messages"" (""ChatId"", ""SenderId"", ""Content"", ""TimeSent"")
                         VALUES (@ChatId, @SenderId, @Content, @TimeSent)
                         RETURNING ""Id"", ""ChatId"", ""SenderId"", ""Content"", ""TimeSent""";
             using var command = dataSource.CreateCommand(sql);
-            command.Parameters.AddWithValue("@ChatId", message.ChatId);
-            command.Parameters.AddWithValue("@SenderId", message.SenderId);
-            command.Parameters.AddWithValue("@Content", message.Content);
+            command.Parameters.AddWithValue("@ChatId", chatId);
+            command.Parameters.AddWithValue("@SenderId", senderId);
+            command.Parameters.AddWithValue("@Content", content);
             command.Parameters.AddWithValue("@TimeSent", DateTime.Now);
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())

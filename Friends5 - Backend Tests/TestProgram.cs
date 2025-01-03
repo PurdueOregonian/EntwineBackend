@@ -32,23 +32,35 @@ namespace Friends5___Backend_Tests
             StringContent httpContent;
             HttpResponseMessage response;
 
-            for(var i = 1; i <= 5; i++)
+            var profileInfos = new List<ReceivedProfileData>
             {
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-24)), Gender = Gender.Female },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-31)), Gender = Gender.Male },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-44)), Gender = Gender.Other },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-52)), Gender = Gender.Male },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-63)), Gender = Gender.Female }
+            };
+
+            for (var i = 1; i <= 5; i++)
+            {
+                requestUrl = "/Auth/Register";
                 var loginInfo = new LoginInfo { Username = $"SomeUsername{i}", Password = "SomePassword5@" };
                 json = JsonSerializer.Serialize(loginInfo, DefaultJsonOptions.Instance);
                 httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
                 response = await _client.PostAsync(requestUrl, httpContent);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+                await TestUtils.LoginAsUser(_client, $"SomeUsername{i}");
+
+                var profileInfo = profileInfos[i - 1];
+                json = JsonSerializer.Serialize(profileInfo, DefaultJsonOptions.Instance);
+                httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                requestUrl = "/Profile/Save";
+                response = await _client.PostAsync(requestUrl, httpContent);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
 
             await TestUtils.LoginAsUser(_client, "SomeUsername1");
-
-            var profileInfo = new ReceivedProfileData { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-24)), Gender = Gender.Female };
-            json = JsonSerializer.Serialize(profileInfo, DefaultJsonOptions.Instance);
-            httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-            requestUrl = "/Profile/Save";
-            response = await _client.PostAsync(requestUrl, httpContent);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             await Task.CompletedTask;
         }

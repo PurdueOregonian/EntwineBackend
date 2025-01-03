@@ -8,6 +8,7 @@ namespace Friends5___Backend_Tests
     {
         private DockerClient _dockerClient;
         private string _containerId;
+        private string _volumeName;
 
         public DockerManager()
         {
@@ -18,6 +19,13 @@ namespace Friends5___Backend_Tests
 
         public async Task StartPostgresContainerAsync(string password)
         {
+            _volumeName = $"pgdata_{Guid.NewGuid()}";
+
+            await _dockerClient.Volumes.CreateAsync(new VolumesCreateParameters
+            {
+                Name = _volumeName
+            });
+
             var containerParams = new CreateContainerParameters
             {
                 Image = "postgres:latest",
@@ -29,7 +37,10 @@ namespace Friends5___Backend_Tests
                 {
                     { "5432/tcp", new List<PortBinding> { new PortBinding { HostPort = "5433" } } }
                 },
-                    Binds = new List<string> { "C:/Users/william/Desktop/schema_dump.sql:/docker-entrypoint-initdb.d/schema_dump.sql" }
+                    Binds = new List<string> {
+                        $"{_volumeName}:/var/lib/postgresql/data",
+                        "C:/Users/william/Desktop/schema_dump.sql:/docker-entrypoint-initdb.d/schema_dump.sql"
+                    }
                 }
             };
 
@@ -77,6 +88,8 @@ namespace Friends5___Backend_Tests
                 await _dockerClient.Containers.StopContainerAsync(_containerId, new ContainerStopParameters());
 
                 await _dockerClient.Containers.RemoveContainerAsync(_containerId, new ContainerRemoveParameters { Force = true });
+
+                await _dockerClient.Volumes.RemoveAsync(_volumeName, true);
             }
         }
 

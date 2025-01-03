@@ -8,6 +8,6 @@ namespace Friends5___Backend.Services
         public Task<List<Message>> GetMessages(int chatId);
         public Task<Chat?> GetChat(int chatId);
         public Task<Chat?> CreateChat(List<int> userIds);
-        public Task<Message?> SendMessage(MessageToSend message);
+        public Task<Message?> SendMessage(int chatId, int senderId, string content);
     }
 }

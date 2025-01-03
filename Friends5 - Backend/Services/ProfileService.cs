@@ -42,18 +42,19 @@ namespace Friends5___Backend.Services
             }
         }
 
-        public async Task SaveProfile(string username, ReceivedProfileData data)
+        public async Task SaveProfile(int userId, string username, ReceivedProfileData data)
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 
             await using (var cmd = dataSource.CreateCommand(@"
-                INSERT INTO public.""Profiles""(""Username"", ""DateOfBirth"", ""Gender"")
-                VALUES (@Username, @DateOfBirth, @Gender)
-                ON CONFLICT (""Username"") 
+                INSERT INTO public.""Profiles""(""Id"", ""Username"", ""DateOfBirth"", ""Gender"")
+                VALUES (@Id, @Username, @DateOfBirth, @Gender)
+                ON CONFLICT (""Id"") 
                 DO UPDATE 
                 SET ""DateOfBirth"" = EXCLUDED.""DateOfBirth"", ""Gender"" = EXCLUDED.""Gender"";
             "))
             {
+                cmd.Parameters.AddWithValue("@Id", userId);
                 cmd.Parameters.AddWithValue("@Username", username);
                 if (data.DateOfBirth is not null)
                 {
