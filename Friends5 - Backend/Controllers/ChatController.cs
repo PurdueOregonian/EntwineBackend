@@ -1,7 +1,9 @@
 using Friends5___Backend.DbItems;
+using Friends5___Backend.PubSub;
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace Friends5___Backend.Controllers
@@ -13,13 +15,16 @@ namespace Friends5___Backend.Controllers
     {
         private readonly IChatService _chatService;
         private readonly IProfileService _profileService;
+        private readonly IHubContext<ChatHub> _chatHubContext;
 
         public ChatController(
             IChatService chatService,
-            IProfileService profileService)
+            IProfileService profileService,
+            IHubContext<ChatHub> chatHubContext)
         {
             _chatService = chatService;
             _profileService = profileService;
+            _chatHubContext = chatHubContext;
         }
 
         [HttpPost]
@@ -146,7 +151,10 @@ namespace Friends5___Backend.Controllers
             {
                 return NotFound();
             }
+
             var message = await _chatService.SendMessage(chatId, userId, data.Content);
+            await _chatHubContext.Clients.Group(chatId.ToString()).SendAsync("ReceiveMessage", message);
+
             return Ok(message);
         }
     }

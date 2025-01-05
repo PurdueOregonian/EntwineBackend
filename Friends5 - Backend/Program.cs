@@ -1,6 +1,7 @@
 using Friends5___Backend;
 using Friends5___Backend.Authentication;
 using Friends5___Backend.DbContext;
+using Friends5___Backend.PubSub;
 using Friends5___Backend.Services;
 using Friends5___Backend.UserId;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddSingleton<TokenBlacklist>();
 builder.Services.AddHttpClient();
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<FriendsDbContext>(options => {
     options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:DefaultConnection"));
 });
@@ -81,6 +83,7 @@ app.UseAuthorization();
 app.UseMiddleware<TokenBlacklistMiddleware>();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();
 

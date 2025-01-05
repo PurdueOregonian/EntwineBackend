@@ -102,7 +102,7 @@ namespace Friends5___Backend.Controllers
 
             var newAccessToken = _authService.GenerateJwtToken(user, DateTime.Now.AddMinutes(30));
 
-            return Ok(new RefreshResult { Username = username, AccessToken = newAccessToken });
+            return Ok(new RefreshResult { Username = username, AccessToken = newAccessToken, UserId = user.Id });
         }
 
 
