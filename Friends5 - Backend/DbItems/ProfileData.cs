@@ -11,5 +11,6 @@ namespace Friends5___Backend.DbItems
         public string? Username { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public Gender? Gender { get; set; }
+        public List<int>? Interests { get; set; }
     }
 }

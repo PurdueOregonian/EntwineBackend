@@ -34,11 +34,11 @@ namespace Friends5___Backend_Tests
 
             var profileInfos = new List<ReceivedProfileData>
             {
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-24)), Gender = Gender.Female },
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-31)), Gender = Gender.Male },
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-44)), Gender = Gender.Other },
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-52)), Gender = Gender.Male },
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-63)), Gender = Gender.Female }
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-24)), Gender = Gender.Female, Interests = [1] },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-31)), Gender = Gender.Male, Interests = [1] },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-44)), Gender = Gender.Other, Interests = [1] },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-52)), Gender = Gender.Male, Interests = [1] },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-63)), Gender = Gender.Female, Interests = [1] }
             };
 
             for (var i = 1; i <= 5; i++)

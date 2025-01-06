@@ -32,7 +32,8 @@ namespace Friends5___Backend.Services
                     Id = reader.GetInt32(0),
                     Username = reader.GetString(1),
                     DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(2)),
-                    Gender = (Gender)reader.GetInt32(3)
+                    Gender = (Gender)reader.GetInt32(3),
+                    Interests = reader.GetFieldValue<List<int>>(4)
                 };
                 return profile;
             }
@@ -47,11 +48,11 @@ namespace Friends5___Backend.Services
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 
             await using (var cmd = dataSource.CreateCommand(@"
-                INSERT INTO public.""Profiles""(""Id"", ""Username"", ""DateOfBirth"", ""Gender"")
-                VALUES (@Id, @Username, @DateOfBirth, @Gender)
+                INSERT INTO public.""Profiles""(""Id"", ""Username"", ""DateOfBirth"", ""Gender"", ""Interests"")
+                VALUES (@Id, @Username, @DateOfBirth, @Gender, @Interests)
                 ON CONFLICT (""Id"") 
                 DO UPDATE 
-                SET ""DateOfBirth"" = EXCLUDED.""DateOfBirth"", ""Gender"" = EXCLUDED.""Gender"";
+                SET ""DateOfBirth"" = EXCLUDED.""DateOfBirth"", ""Gender"" = EXCLUDED.""Gender"", ""Interests"" = EXCLUDED.""Interests"";
             "))
             {
                 cmd.Parameters.AddWithValue("@Id", userId);
@@ -63,6 +64,10 @@ namespace Friends5___Backend.Services
                 if (data.Gender is not null)
                 {
                     cmd.Parameters.AddWithValue("@Gender", (int)data.Gender);
+                }
+                if (data.Interests is not null)
+                {
+                    cmd.Parameters.AddWithValue("@Interests", data.Interests);
                 }
                 await cmd.ExecuteNonQueryAsync();
             }
@@ -133,7 +138,8 @@ namespace Friends5___Backend.Services
                     Id = reader.GetInt32(0),
                     Username = reader.GetString(1),
                     DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(2)),
-                    Gender = (Gender)reader.GetInt32(3)
+                    Gender = (Gender)reader.GetInt32(3),
+                    Interests = reader.GetFieldValue<List<int>>(4)
                 };
                 if (profile.Username != username)
                 {
