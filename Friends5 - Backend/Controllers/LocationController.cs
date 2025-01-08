@@ -6,7 +6,7 @@ namespace Friends5___Backend.Controllers
 {
     [ApiController]
     [Route("/Location")]
-    [Authorize]
+    [Authorize(Policy = "UserId")]
     public class LocationController : ControllerBase
     {
         IHttpClientFactory _httpClientFactory;
@@ -24,11 +24,6 @@ namespace Friends5___Backend.Controllers
             [FromQuery] string longitude
             )
         {
-            if (User.Identity?.Name is null)
-            {
-                return Unauthorized();
-            }
-
             var httpClient = _httpClientFactory.CreateClient();
             var locationResponse = await httpClient.GetAsync(
                 $"https://maps.googleapis.com/maps/api/geocode/json?latlng={latitude},{longitude}&key=AIzaSyCdvn48IcClIf3q94R7-8V3JJ-BH5zrBxo");

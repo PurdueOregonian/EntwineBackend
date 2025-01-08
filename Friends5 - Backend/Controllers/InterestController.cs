@@ -1,13 +1,12 @@
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Friends5___Backend.Controllers
 {
     [ApiController]
     [Route("/Interest")]
-    [Authorize]
+    [Authorize(Policy = "UserId")]
     public class InterestController : ControllerBase
     {
         private readonly IInterestService _interestService;
@@ -18,7 +17,7 @@ namespace Friends5___Backend.Controllers
             _interestService = interestService;
         }
 
-        [HttpGet("/Category")]
+        [HttpGet("Category")]
         public async Task<IActionResult> GetInterestCategories()
         {
             var categories = await _interestService.GetInterestCategories();

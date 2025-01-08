@@ -7,7 +7,7 @@ namespace Friends5___Backend.Controllers
 {
     [ApiController]
     [Route("/Profile")]
-    [Authorize]
+    [Authorize(Policy = "UserId")]
     public class ProfileController : ControllerBase
     {
         private readonly ILogger<ProfileController> _logger;
@@ -24,12 +24,7 @@ namespace Friends5___Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOwnProfileAsync()
         {
-            if (User.Identity?.Name is null)
-            {
-                return Unauthorized();
-            }
-
-            var username = User.Identity.Name.ToString();
+            var username = User.Identity!.Name!.ToString();
 
             var profile = await _profileService.GetProfile(username);
 
@@ -44,11 +39,6 @@ namespace Friends5___Backend.Controllers
         [HttpGet("{username}")]
         public async Task<IActionResult> GetProfileAsync(string username)
         {
-            if (User.Identity?.Name is null)
-            {
-                return Unauthorized();
-            }
-
             var profile = await _profileService.GetProfile(username);
 
             if (profile == null)
@@ -59,7 +49,8 @@ namespace Friends5___Backend.Controllers
             var dataToReturn = new ProfileSearchReturnData
             {
                 Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
-                Gender = profile.Gender
+                Gender = profile.Gender,
+                Interests = profile.Interests
             };
             return Ok(dataToReturn);
         }
@@ -67,19 +58,10 @@ namespace Friends5___Backend.Controllers
         [HttpPost("Save")]
         public async Task<IActionResult> SaveProfileAsync([FromBody] ReceivedProfileData data)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                return Unauthorized();
-            }
-            var userId = int.Parse(userIdClaim.Value);
-            if (User.Identity?.Name is null)
-            {
-                return Unauthorized();
-            }
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             try
             {
-                await _profileService.SaveProfile(userId, User.Identity.Name, data);
+                await _profileService.SaveProfile(userId, User.Identity!.Name!, data);
             }
             catch (Exception e)
             {

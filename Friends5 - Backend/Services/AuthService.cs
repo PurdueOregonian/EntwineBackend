@@ -119,5 +119,9 @@ namespace Friends5___Backend.Services
         {
             return _userManager.FindByNameAsync(username).Result;
         }
+        public string? GetUsernameFromId(int id)
+        {
+            return _userManager.FindByIdAsync(id.ToString()).Result?.UserName;
+        }
     }
 }

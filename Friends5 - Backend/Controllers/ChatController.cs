@@ -10,20 +10,20 @@ namespace Friends5___Backend.Controllers
 {
     [ApiController]
     [Route("/Chat")]
-    [Authorize]
+    [Authorize(Policy = "UserId")]
     public class ChatController : ControllerBase
     {
         private readonly IChatService _chatService;
-        private readonly IProfileService _profileService;
+        private readonly IAuthService _authService;
         private readonly IHubContext<ChatHub> _chatHubContext;
 
         public ChatController(
             IChatService chatService,
-            IProfileService profileService,
+            IAuthService authService,
             IHubContext<ChatHub> chatHubContext)
         {
             _chatService = chatService;
-            _profileService = profileService;
+            _authService = authService;
             _chatHubContext = chatHubContext;
         }
 
@@ -35,12 +35,7 @@ namespace Friends5___Backend.Controllers
                 return BadRequest();
             }
 
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                return Unauthorized();
-            }
-            var userId = int.Parse(userIdClaim.Value);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var userIds = data.UserIds;
             userIds.Add(userId);
             var chat = await _chatService.CreateChat(userIds);
@@ -54,13 +49,7 @@ namespace Friends5___Backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetChats()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                return Unauthorized();
-            }
-
-            var userId = int.Parse(userIdClaim.Value);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var chats = await _chatService.GetChats(userId);
 
@@ -72,7 +61,7 @@ namespace Friends5___Backend.Controllers
                 {
                     if (id != userId)
                     {
-                        var username = await _profileService.GetUsernameFromId(id);
+                        var username = _authService.GetUsernameFromId(id);
                         if (username != null)
                         {
                             otherUsernames.Add(username);
@@ -92,12 +81,6 @@ namespace Friends5___Backend.Controllers
         [HttpGet("{chatId}/Messages")]
         public async Task<IActionResult> GetMessages([FromRoute] int chatId)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                return Unauthorized();
-            }
-
             var chat = await _chatService.GetChat(chatId);
 
             if(chat is null)
@@ -110,8 +93,7 @@ namespace Friends5___Backend.Controllers
                 return StatusCode(500);
             }
 
-            var userId = int.Parse(userIdClaim.Value);
-
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             if (!chat.UserIds.Contains(userId))
             {
                 // maybe giving away info about which users are in the chat is a bad idea so return NotFound
@@ -126,12 +108,6 @@ namespace Friends5___Backend.Controllers
         [HttpPost("{chatId}/Messages")]
         public async Task<IActionResult> SendMessage([FromRoute] int chatId, [FromBody] MessageToSend data)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                return Unauthorized();
-            }
-
             if (data.Content is null)
             {
                 return BadRequest();
@@ -146,7 +122,7 @@ namespace Friends5___Backend.Controllers
             {
                 return StatusCode(500);
             }
-            var userId = int.Parse(userIdClaim.Value);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             if (!chat.UserIds.Contains(userId))
             {
                 return NotFound();

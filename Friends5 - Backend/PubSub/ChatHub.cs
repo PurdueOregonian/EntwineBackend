@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace Friends5___Backend.PubSub
 {
-    [Authorize]
+    [Authorize(Policy = "UserId")]
     public class ChatHub : Hub
     {
         private readonly IChatService _chatService;

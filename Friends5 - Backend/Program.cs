@@ -64,7 +64,13 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UserId", policy =>
+    {
+        policy.Requirements.Add(new UserIdRequirement());
+    });
+});
 
 var app = builder.Build();
 
