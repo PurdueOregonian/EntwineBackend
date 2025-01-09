@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntwineBackend", "EntwineBackend\EntwineBackend.csproj", "{F120B950-EBB4-40CC-AA98-14681B443033}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntwineBackend.Tests", "EntwineBackend.Tests\EntwineBackend.Tests.csproj", "{4F191C4B-C77F-46C6-8CAA-F6C05D13445F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F120B950-EBB4-40CC-AA98-14681B443033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F120B950-EBB4-40CC-AA98-14681B443033}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F120B950-EBB4-40CC-AA98-14681B443033}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F120B950-EBB4-40CC-AA98-14681B443033}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F191C4B-C77F-46C6-8CAA-F6C05D13445F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F191C4B-C77F-46C6-8CAA-F6C05D13445F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F191C4B-C77F-46C6-8CAA-F6C05D13445F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F191C4B-C77F-46C6-8CAA-F6C05D13445F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4D4E0E8A-EF6F-4891-98AC-0E5F045B0609}
+	EndGlobalSection
+EndGlobal
