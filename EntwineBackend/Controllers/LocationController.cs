@@ -10,12 +10,23 @@ namespace EntwineBackend.Controllers
     public class LocationController : ControllerBase
     {
         IHttpClientFactory _httpClientFactory;
+        private readonly string _apiKey;
         private readonly ILogger<LocationController> _logger;
 
         public LocationController(ILogger<LocationController> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
+            _apiKey = ReadApiKeyFromFile("./ApiKey.txt");
+        }
+
+        private string ReadApiKeyFromFile(string filePath)
+        {
+            if (System.IO.File.Exists(filePath))
+            {
+                return System.IO.File.ReadAllText(filePath).Trim();
+            }
+            throw new FileNotFoundException("API key file not found.", filePath);
         }
 
         [HttpGet]
@@ -26,7 +37,7 @@ namespace EntwineBackend.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
             var locationResponse = await httpClient.GetAsync(
-                $"https://maps.googleapis.com/maps/api/geocode/json?latlng={latitude},{longitude}&key=AIzaSyCdvn48IcClIf3q94R7-8V3JJ-BH5zrBxo");
+                $"https://maps.googleapis.com/maps/api/geocode/json?latlng={latitude},{longitude}&key={_apiKey}");
 
             if (locationResponse.IsSuccessStatusCode)
             {
