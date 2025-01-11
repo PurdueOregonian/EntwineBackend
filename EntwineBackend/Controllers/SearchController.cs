@@ -1,6 +1,7 @@
 using EntwineBackend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EntwineBackend.Controllers
 {
@@ -25,7 +26,9 @@ namespace EntwineBackend.Controllers
                 return BadRequest("Search string cannot be empty.");
             }
 
-            var users = await _profileService.SearchUsers(User.Identity!.Name!, searchString);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var users = await _profileService.SearchUsers(userId, searchString);
 
             return Ok(users);
         }
@@ -33,7 +36,9 @@ namespace EntwineBackend.Controllers
         [HttpPost]
         public async Task<IActionResult> SearchProfilesAsync([FromBody] SearchProfileData data)
         {
-            var profiles = await _profileService.SearchProfiles(User.Identity!.Name!, data);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            var profiles = await _profileService.SearchProfiles(userId, data);
 
             return Ok(profiles);
         }

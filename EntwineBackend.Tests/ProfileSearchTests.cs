@@ -33,12 +33,13 @@ namespace EntwineBackend_Tests
 
                 await TestUtils.LoginAsUser(_client, "SomeUsername2");
 
-                requestUrl = "/Profile/SomeUsername1";
+                requestUrl = "/Profile/1";
                 response = await _client.GetAsync(requestUrl);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 responseContent = await response.Content.ReadAsStringAsync();
                 var otherProfileData = JsonSerializer.Deserialize<ProfileSearchReturnData>(responseContent, DefaultJsonOptions.Instance);
-                Assert.Equal(24, otherProfileData!.Age);
+                Assert.Equal("SomeUsername1", otherProfileData!.Username);
+                Assert.Equal(24, otherProfileData.Age);
                 Assert.Equal(Gender.Female, otherProfileData.Gender);
             }
             finally

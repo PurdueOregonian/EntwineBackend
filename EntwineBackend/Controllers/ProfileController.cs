@@ -24,9 +24,9 @@ namespace EntwineBackend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOwnProfileAsync()
         {
-            var username = User.Identity!.Name!.ToString();
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var profile = await _profileService.GetProfile(username);
+            var profile = await _profileService.GetProfile(userId);
 
             if (profile == null)
             {
@@ -36,10 +36,10 @@ namespace EntwineBackend.Controllers
             return Ok(profile);
         }
 
-        [HttpGet("{username}")]
-        public async Task<IActionResult> GetProfileAsync(string username)
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetProfileAsync(int userId)
         {
-            var profile = await _profileService.GetProfile(username);
+            var profile = await _profileService.GetProfile(userId);
 
             if (profile == null)
             {
@@ -48,6 +48,7 @@ namespace EntwineBackend.Controllers
 
             var dataToReturn = new ProfileSearchReturnData
             {
+                Username = profile.Username,
                 Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
                 Gender = profile.Gender,
                 Interests = profile.Interests

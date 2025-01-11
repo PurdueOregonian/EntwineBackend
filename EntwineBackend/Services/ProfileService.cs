@@ -13,16 +13,16 @@ namespace EntwineBackend.Services
             _connectionString = config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
         }
 
-        public async Task<ProfileData?> GetProfile(string username)
+        public async Task<ProfileData?> GetProfile(int userId)
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 
             var sql = @"SELECT * FROM public.""Profiles""
-                        WHERE ""Profiles"".""Username"" = @Username";
+                        WHERE ""Profiles"".""Id"" = @Id";
 
             using var command = dataSource.CreateCommand(sql);
 
-            command.Parameters.AddWithValue("@Username", username);
+            command.Parameters.AddWithValue("@Id", userId);
 
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
@@ -72,7 +72,7 @@ namespace EntwineBackend.Services
                 await cmd.ExecuteNonQueryAsync();
             }
         }
-        public async Task<List<ProfileData>> SearchUsers(string username, string searchString)
+        public async Task<List<ProfileData>> SearchUsers(int userId, string searchString)
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 
@@ -91,7 +91,7 @@ namespace EntwineBackend.Services
                     Id = reader.GetInt32(0),
                     Username = reader.GetString(1)
                 };
-                if (user.Username != username)
+                if (user.Id != userId)
                 {
                     users.Add(user);
                 }
@@ -100,7 +100,7 @@ namespace EntwineBackend.Services
             return users;
         }
 
-        public async Task<List<ProfileData>> SearchProfiles(string username, SearchProfileData data)
+        public async Task<List<ProfileData>> SearchProfiles(int userId, SearchProfileData data)
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 
@@ -141,7 +141,7 @@ namespace EntwineBackend.Services
                     Gender = (Gender)reader.GetInt32(3),
                     Interests = reader.GetFieldValue<List<int>>(4)
                 };
-                if (profile.Username != username)
+                if (profile.Id != userId)
                 {
                     profiles.Add(profile);
                 }
