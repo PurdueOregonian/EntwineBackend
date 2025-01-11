@@ -93,6 +93,17 @@ namespace EntwineBackend.Services
 
         public async Task<Chat?> CreateChat(List<int> userIds)
         {
+            if(userIds.Count < 2)
+            {
+                return null;
+            }
+            var existingChats = await GetChats(userIds.First());
+            // Ok for this to be kinda expensive since it is uncommon to create a chat
+            if (existingChats.Any(chat => (chat.UserIds ?? []).SequenceEqual(userIds)))
+            {
+                return null;
+            }
+
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
             var sql = @"INSERT INTO public.""Chats"" (""UserIds"")
                         VALUES (@UserIds)
