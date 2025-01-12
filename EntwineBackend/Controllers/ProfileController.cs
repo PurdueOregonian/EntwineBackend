@@ -64,7 +64,7 @@ namespace EntwineBackend.Controllers
             {
                 await _profileService.SaveProfile(userId, User.Identity!.Name!, data);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return StatusCode(500);
             }

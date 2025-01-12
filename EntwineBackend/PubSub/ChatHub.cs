@@ -51,5 +51,11 @@ namespace EntwineBackend.PubSub
 
             await base.OnConnectedAsync();
         }
+
+        public bool IsConnected()
+        {
+            // For testing. Returns true after OnConnectedAsync is done
+            return true;
+        }
     }
 }

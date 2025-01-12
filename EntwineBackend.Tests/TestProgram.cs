@@ -1,7 +1,10 @@
 ﻿using EntwineBackend;
 using EntwineBackend.Authentication;
+using EntwineBackend.DbItems;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 
 namespace EntwineBackend_Tests
@@ -12,6 +15,7 @@ namespace EntwineBackend_Tests
         private readonly HttpClient _client;
         private readonly DockerManager _dockerManager;
         public HttpClient Client => _client;
+        public TestServer Server => _factory.Server;
 
         public TestProgram()
         {
@@ -46,7 +50,7 @@ namespace EntwineBackend_Tests
                 requestUrl = "/Auth/Register";
                 var loginInfo = new LoginInfo { Username = $"SomeUsername{i}", Password = "SomePassword5@" };
                 json = JsonSerializer.Serialize(loginInfo, DefaultJsonOptions.Instance);
-                httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                httpContent = new StringContent(json, Encoding.UTF8, "application/json");
                 response = await _client.PostAsync(requestUrl, httpContent);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -54,13 +58,26 @@ namespace EntwineBackend_Tests
 
                 var profileInfo = profileInfos[i - 1];
                 json = JsonSerializer.Serialize(profileInfo, DefaultJsonOptions.Instance);
-                httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+                httpContent = new StringContent(json, Encoding.UTF8, "application/json");
                 requestUrl = "/Profile/Save";
                 response = await _client.PostAsync(requestUrl, httpContent);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
 
             await TestUtils.LoginAsUser(_client, "SomeUsername1");
+
+            // add a chat
+            requestUrl = "/Chat";
+            var createChatData = new CreateChatData { UserIds = [2] };
+            json = JsonSerializer.Serialize(createChatData, DefaultJsonOptions.Instance);
+            httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            response = await _client.PostAsync(requestUrl, httpContent);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var newChat = JsonSerializer.Deserialize<Chat>(responseContent, DefaultJsonOptions.Instance);
+            Assert.Equal(2, newChat!.UserIds!.Count);
+            Assert.Contains(1, newChat.UserIds);
+            Assert.Contains(2, newChat.UserIds);
 
             await Task.CompletedTask;
         }

@@ -22,28 +22,18 @@ namespace EntwineBackend_Tests
             try
             {
                 var requestUrl = "/Chat";
-                var createChatData = new CreateChatData { UserIds = [2] };
-                var json = JsonSerializer.Serialize(createChatData, DefaultJsonOptions.Instance);
-                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _client.PostAsync(requestUrl, httpContent);
+
+                var response = await _client.GetAsync(requestUrl);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var newChat = JsonSerializer.Deserialize<Chat>(responseContent, DefaultJsonOptions.Instance);
-                Assert.Equal(2, newChat!.UserIds!.Count);
-                Assert.Contains(1, newChat.UserIds);
-                Assert.Contains(2, newChat.UserIds);
-
-                response = await _client.GetAsync(requestUrl);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                responseContent = await response.Content.ReadAsStringAsync();
                 var chats = JsonSerializer.Deserialize<List<ChatData>>(responseContent, DefaultJsonOptions.Instance);
                 Assert.Single(chats!);
                 Assert.Equal("SomeUsername2", chats![0].Usernames!.Single());
 
                 requestUrl = "/Chat/1/Messages";
                 var messageData = new MessageToSend { Content = "Hello" };
-                json = JsonSerializer.Serialize(messageData, DefaultJsonOptions.Instance);
-                httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+                var json = JsonSerializer.Serialize(messageData, DefaultJsonOptions.Instance);
+                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
                 response = await _client.PostAsync(requestUrl, httpContent);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 responseContent = await response.Content.ReadAsStringAsync();
@@ -57,10 +47,10 @@ namespace EntwineBackend_Tests
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 responseContent = await response.Content.ReadAsStringAsync();
                 var messages = JsonSerializer.Deserialize<List<Message>>(responseContent, DefaultJsonOptions.Instance);
-                Assert.Single(messages!);
-                Assert.Equal(1, messages![0].SenderId);
-                Assert.Equal(1, messages[0].ChatId);
-                Assert.Contains("Hello", messages[0].Content);
+                // ChatHubTests could have sent a message also. Just check the last message
+                Assert.Equal(1, messages![^1].SenderId);
+                Assert.Equal(1, messages[^1].ChatId);
+                Assert.Contains("Hello", messages[^1].Content);
             }
             finally
             {
