@@ -5,6 +5,7 @@ using EntwineBackend.PubSub;
 using EntwineBackend.Services;
 using EntwineBackend.UserId;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IInterestService, InterestService>();
+builder.Services.AddScoped<IAuthorizationHandler, UserInChatRequirementHandler>();
 builder.Services.AddSingleton<TokenBlacklist>();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
@@ -85,6 +87,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("UserId", policy =>
     {
         policy.Requirements.Add(new UserIdRequirement());
+    });
+    options.AddPolicy("UserInChat", policy =>
+    {
+        policy.Requirements.Add(new UserInChatRequirement());
     });
 });
 

@@ -36,6 +36,7 @@ namespace EntwineBackend_Tests
                 })
                 .Build();
             await connection.StartAsync();
+            Assert.Equal(HubConnectionState.Connected, connection.State);
 
             var tcs = new TaskCompletionSource<bool>();
             connection.On<Message>("ReceiveMessage", messageReceived =>
@@ -43,7 +44,6 @@ namespace EntwineBackend_Tests
                 message = messageReceived.Content;
                 tcs.SetResult(true);
             });
-            await connection.InvokeAsync("IsConnected");
 
             var requestUrl = "/Chat/1/Messages";
             var messageData = new MessageToSend { Content = "Hello" };
@@ -54,6 +54,30 @@ namespace EntwineBackend_Tests
             await tcs.Task;
 
             Assert.Equal("Hello", message);
+        }
+
+        [Fact]
+        public async Task CannotConnectToChatUserIsNotPartOf()
+        {
+            try
+            {
+                await TestUtils.LoginAsUser(_client, "SomeUsername3");
+
+                var token = _client.DefaultRequestHeaders.Authorization!.ToString()["Bearer ".Length..];
+
+                var connection = new HubConnectionBuilder()
+                    .WithUrl($"{_client.BaseAddress}chatHub?chatId=1", options =>
+                    {
+                        options.AccessTokenProvider = () => Task.FromResult<string?>(token);
+                        options.HttpMessageHandlerFactory = _ => _server.CreateHandler();
+                    })
+                    .Build();
+                await Assert.ThrowsAsync<HttpRequestException>(async () => await connection.StartAsync());
+            }
+            finally
+            {
+                await TestUtils.LoginAsUser(_client, "SomeUsername1");
+            }
         }
     }
 }
