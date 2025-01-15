@@ -10,11 +10,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EntwineBackend.Migrations
+namespace Friends5___Backend.Migrations
 {
     [DbContext(typeof(FriendsDbContext))]
-    [Migration("20241231193933_Chats")]
-    partial class Chats
+    [Migration("20250115062910_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,6 +74,218 @@ namespace EntwineBackend.Migrations
                     b.ToTable("Chats");
                 });
 
+            modelBuilder.Entity("EntwineBackend.DbItems.Community", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("Location")
+                        .HasColumnType("integer");
+
+                    b.Property<List<int>>("UserIds")
+                        .HasColumnType("integer[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("Communities");
+                });
+
+            modelBuilder.Entity("EntwineBackend.DbItems.Interest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<List<int>>("Categories")
+                        .HasColumnType("integer[]");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("Interests");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Categories = new List<int> { 1 },
+                            Name = "Digital Art"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Categories = new List<int> { 1 },
+                            Name = "Photography"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Categories = new List<int> { 1 },
+                            Name = "Painting"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Categories = new List<int> { 1 },
+                            Name = "Knitting"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Categories = new List<int> { 1, 6 },
+                            Name = "Music Composition"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Categories = new List<int> { 1, 6 },
+                            Name = "Cooking"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Categories = new List<int> { 1, 6 },
+                            Name = "Woodworking"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Categories = new List<int> { 2, 4 },
+                            Name = "Hiking"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Categories = new List<int> { 2 },
+                            Name = "Gardening"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Categories = new List<int> { 1, 3 },
+                            Name = "Programming"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Categories = new List<int> { 1, 3 },
+                            Name = "Hardware Assembly"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Categories = new List<int> { 4 },
+                            Name = "Basketball"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Categories = new List<int> { 4 },
+                            Name = "Soccer"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Categories = new List<int> { 5 },
+                            Name = "Backpacking"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Categories = new List<int> { 6 },
+                            Name = "Jazz"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Categories = new List<int> { 6 },
+                            Name = "Pop"
+                        });
+                });
+
+            modelBuilder.Entity("EntwineBackend.DbItems.InterestCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("InterestCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Creativity"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Nature"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Technology"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Fitness & Sports"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Travel"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Music"
+                        });
+                });
+
+            modelBuilder.Entity("EntwineBackend.DbItems.Location", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("Locations");
+                });
+
             modelBuilder.Entity("EntwineBackend.DbItems.Message", b =>
                 {
                     b.Property<int>("Id")
@@ -96,8 +308,7 @@ namespace EntwineBackend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Id")
-                        .IsUnique();
+                    b.HasIndex("ChatId");
 
                     b.ToTable("Messages");
                 });
@@ -115,6 +326,9 @@ namespace EntwineBackend.Migrations
 
                     b.Property<int?>("Gender")
                         .HasColumnType("integer");
+
+                    b.Property<List<int>>("Interests")
+                        .HasColumnType("integer[]");
 
                     b.Property<string>("Username")
                         .HasColumnType("text");

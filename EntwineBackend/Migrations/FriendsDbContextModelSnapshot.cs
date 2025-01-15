@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EntwineBackend.Migrations
+namespace Friends5___Backend.Migrations
 {
     [DbContext(typeof(FriendsDbContext))]
     partial class FriendsDbContextModelSnapshot : ModelSnapshot
@@ -79,8 +79,8 @@ namespace EntwineBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Location")
-                        .HasColumnType("text");
+                    b.Property<int?>("Location")
+                        .HasColumnType("integer");
 
                     b.Property<List<int>>("UserIds")
                         .HasColumnType("integer[]");
@@ -262,6 +262,25 @@ namespace EntwineBackend.Migrations
                             Id = 6,
                             Name = "Music"
                         });
+                });
+
+            modelBuilder.Entity("EntwineBackend.DbItems.Location", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("Locations");
                 });
 
             modelBuilder.Entity("EntwineBackend.DbItems.Message", b =>

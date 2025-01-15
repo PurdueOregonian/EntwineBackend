@@ -5,12 +5,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace EntwineBackend.DbItems
 {
     [Index(nameof(Id), IsUnique = true)]
-    public class Community
+    public class Location
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int? Location { get; set; }
-        public List<int>? UserIds { get; set; }
+        public string? Name { get; set; }
     }
 }

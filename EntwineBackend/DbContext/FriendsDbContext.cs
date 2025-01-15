@@ -15,6 +15,7 @@ namespace EntwineBackend.DbContext
         public DbSet<Community> Communities { get; set; }
         public DbSet<InterestCategory> InterestCategories { get; set; }
         public DbSet<Interest> Interests { get; set; }
+        public DbSet<Location> Locations { get; set; }
         public DbSet<ApplicationUserLogin> ApplicationUserLogins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
