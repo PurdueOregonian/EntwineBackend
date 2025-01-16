@@ -1,3 +1,4 @@
+using EntwineBackend.DbItems;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json.Nodes;
@@ -72,7 +73,7 @@ namespace EntwineBackend.Controllers
 
                     if (city != null && country != null)
                     {
-                        return Ok(new { City = city, Country = country, State = state });
+                        return Ok(new Location{ City = city, Country = country, State = state });
                     }
                 }
 
