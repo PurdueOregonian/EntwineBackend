@@ -1,4 +1,4 @@
-﻿namespace EntwineBackend
+﻿namespace Friends5___Backend.Data
 {
     public class CreateChatData
     {

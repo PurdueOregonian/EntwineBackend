@@ -1,4 +1,7 @@
 ﻿using EntwineBackend.DbItems;
+using Friends5___Backend;
+using Friends5___Backend.Data;
+using Friends5___Backend.Services;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -33,7 +36,8 @@ namespace EntwineBackend.Services
                     Username = reader.GetString(1),
                     DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(2)),
                     Gender = (Gender)reader.GetInt32(3),
-                    Interests = reader.GetFieldValue<List<int>>(4)
+                    Interests = reader.GetFieldValue<List<int>>(4),
+                    Location = reader.GetInt32(5)
                 };
                 return profile;
             }
@@ -43,16 +47,16 @@ namespace EntwineBackend.Services
             }
         }
 
-        public async Task SaveProfile(int userId, string username, ReceivedProfileData data)
+        public async Task SaveProfile(int userId, string username, ServiceInputProfileData data)
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 
             await using (var cmd = dataSource.CreateCommand(@"
-                INSERT INTO public.""Profiles""(""Id"", ""Username"", ""DateOfBirth"", ""Gender"", ""Interests"")
-                VALUES (@Id, @Username, @DateOfBirth, @Gender, @Interests)
+                INSERT INTO public.""Profiles""(""Id"", ""Username"", ""DateOfBirth"", ""Gender"", ""Interests"", ""Location"")
+                VALUES (@Id, @Username, @DateOfBirth, @Gender, @Interests, @Location)
                 ON CONFLICT (""Id"") 
                 DO UPDATE 
-                SET ""DateOfBirth"" = EXCLUDED.""DateOfBirth"", ""Gender"" = EXCLUDED.""Gender"", ""Interests"" = EXCLUDED.""Interests"";
+                SET ""DateOfBirth"" = EXCLUDED.""DateOfBirth"", ""Gender"" = EXCLUDED.""Gender"", ""Interests"" = EXCLUDED.""Interests"", ""Location"" = EXCLUDED.""Location"";
             "))
             {
                 cmd.Parameters.AddWithValue("@Id", userId);
@@ -68,6 +72,10 @@ namespace EntwineBackend.Services
                 if (data.Interests is not null)
                 {
                     cmd.Parameters.AddWithValue("@Interests", data.Interests);
+                }
+                if (data.Location is not null)
+                {
+                    cmd.Parameters.AddWithValue("@Location", data.Location);
                 }
                 await cmd.ExecuteNonQueryAsync();
             }
@@ -100,7 +108,7 @@ namespace EntwineBackend.Services
             return users;
         }
 
-        public async Task<List<ProfileData>> SearchProfiles(int userId, SearchProfileData data)
+        public async Task<List<ProfileData>> SearchProfiles(int userId, SearchProfileParams data)
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 

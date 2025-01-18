@@ -1,18 +1,14 @@
 ﻿using Friends5___Backend;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 
 namespace EntwineBackend.DbItems
 {
-    [Index(nameof(Id), IsUnique = true)]
-    public class ProfileData
+    public class OwnProfileReturnData
     {
-        [Key]
         public int Id { get; set; }
         public string? Username { get; set; }
         public DateOnly? DateOfBirth { get; set; }
         public Gender? Gender { get; set; }
         public List<int>? Interests { get; set; }
-        public int? Location { get; set; }
+        public Location? Location { get; set; }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using EntwineBackend;
 using EntwineBackend.Authentication;
 using EntwineBackend.DbItems;
+using Friends5___Backend;
+using Friends5___Backend.Data;
+using Friends5___Backend_Tests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using System.Net;
@@ -36,13 +39,13 @@ namespace EntwineBackend_Tests
             StringContent httpContent;
             HttpResponseMessage response;
 
-            var profileInfos = new List<ReceivedProfileData>
+            var profileInfos = new List<InputProfileData>
             {
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-24)), Gender = Gender.Female, Interests = [1] },
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-31)), Gender = Gender.Male, Interests = [1] },
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-44)), Gender = Gender.Other, Interests = [1] },
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-52)), Gender = Gender.Male, Interests = [1] },
-                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-63)), Gender = Gender.Female, Interests = [1] }
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-24)), Gender = Gender.Female, Interests = [1], Location = TestConstants.TestLocation },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-31)), Gender = Gender.Male, Interests = [1], Location = TestConstants.TestLocation },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-44)), Gender = Gender.Other, Interests = [1], Location = TestConstants.TestLocation },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-52)), Gender = Gender.Male, Interests = [1], Location = TestConstants.TestLocation2 },
+                new() { DateOfBirth = DateOnly.FromDateTime(DateTime.Now.AddYears(-63)), Gender = Gender.Female, Interests = [1], Location = TestConstants.TestLocation2 }
             };
 
             for (var i = 1; i <= 5; i++)

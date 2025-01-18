@@ -1,4 +1,8 @@
+using EntwineBackend.DbItems;
 using EntwineBackend.Services;
+using Friends5___Backend;
+using Friends5___Backend.Data;
+using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -12,13 +16,16 @@ namespace EntwineBackend.Controllers
     {
         private readonly ILogger<ProfileController> _logger;
         private readonly IProfileService _profileService;
+        private readonly ILocationService _locationService;
 
         public ProfileController(
             ILogger<ProfileController> logger,
-            IProfileService profileService)
+            IProfileService profileService,
+            ILocationService locationService)
         {
             _logger = logger;
             _profileService = profileService;
+            _locationService = locationService;
         }
 
         [HttpGet]
@@ -32,6 +39,16 @@ namespace EntwineBackend.Controllers
             {
                 return NotFound();
             }
+
+            var ownProfileReturnData = new OwnProfileReturnData
+            {
+                Id = profile.Id,
+                Username = profile.Username,
+                DateOfBirth = profile.DateOfBirth,
+                Gender = profile.Gender,
+                Interests = profile.Interests,
+                Location = profile.Location == null ? null : await _locationService.GetLocationById(profile.Location.Value)
+            };
 
             return Ok(profile);
         }
@@ -51,18 +68,34 @@ namespace EntwineBackend.Controllers
                 Username = profile.Username,
                 Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
                 Gender = profile.Gender,
-                Interests = profile.Interests
+                Interests = profile.Interests,
+                Location = profile.Location == null ? null : await _locationService.GetLocationById(profile.Location.Value)
             };
             return Ok(dataToReturn);
         }
 
         [HttpPost("Save")]
-        public async Task<IActionResult> SaveProfileAsync([FromBody] ReceivedProfileData data)
+        public async Task<IActionResult> SaveProfileAsync([FromBody] InputProfileData data)
         {
+            var location = data.Location;
+            int? locationId = null;
+            if (location != null)
+            {
+                locationId = await _locationService.GetLocationId(location);
+            }
+
+            var serviceInputProfileData = new ServiceInputProfileData
+            {
+                DateOfBirth = data.DateOfBirth,
+                Gender = data.Gender,
+                Interests = data.Interests,
+                Location = locationId
+            };
+
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             try
             {
-                await _profileService.SaveProfile(userId, User.Identity!.Name!, data);
+                await _profileService.SaveProfile(userId, User.Identity!.Name!, serviceInputProfileData);
             }
             catch (Exception)
             {

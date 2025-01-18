@@ -1,6 +1,6 @@
-﻿namespace EntwineBackend
+﻿namespace Friends5___Backend.Data
 {
-    public class SearchProfileData
+    public class SearchProfileParams
     {
         public int MinAge { get; set; } = 18;
         public int MaxAge { get; set; } = 100;

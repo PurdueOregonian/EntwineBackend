@@ -1,4 +1,5 @@
 using EntwineBackend.Services;
+using Friends5___Backend.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -34,7 +35,7 @@ namespace EntwineBackend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SearchProfilesAsync([FromBody] SearchProfileData data)
+        public async Task<IActionResult> SearchProfilesAsync([FromBody] SearchProfileParams data)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
