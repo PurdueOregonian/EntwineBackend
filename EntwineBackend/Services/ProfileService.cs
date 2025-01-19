@@ -37,7 +37,7 @@ namespace EntwineBackend.Services
                     DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(2)),
                     Gender = (Gender)reader.GetInt32(3),
                     Interests = reader.GetFieldValue<List<int>>(4),
-                    Location = reader.GetInt32(5)
+                    Location = reader.IsDBNull(5) ? null : reader.GetInt32(5)
                 };
                 return profile;
             }
