@@ -1,6 +1,5 @@
 using EntwineBackend.DbItems;
 using EntwineBackend.Services;
-using Friends5___Backend;
 using Friends5___Backend.Data;
 using Friends5___Backend.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -50,7 +49,7 @@ namespace EntwineBackend.Controllers
                 Location = profile.Location == null ? null : await _locationService.GetLocationById(profile.Location.Value)
             };
 
-            return Ok(profile);
+            return Ok(ownProfileReturnData);
         }
 
         [HttpGet("{userId}")]

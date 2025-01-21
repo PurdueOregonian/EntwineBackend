@@ -2,6 +2,7 @@
 using EntwineBackend.DbItems;
 using Friends5___Backend;
 using Friends5___Backend.Data;
+using Friends5___Backend_Tests;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -27,11 +28,12 @@ namespace EntwineBackend_Tests
                 var response = await _client.GetAsync(requestUrl);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var profileData = JsonSerializer.Deserialize<ProfileData>(responseContent, DefaultJsonOptions.Instance);
+                var profileData = JsonSerializer.Deserialize<OwnProfileReturnData>(responseContent, DefaultJsonOptions.Instance);
                 Assert.Equal(DateTime.Now.Year - 24, profileData!.DateOfBirth!.Value.Year);
                 Assert.Equal(DateTime.Now.Month, profileData.DateOfBirth!.Value.Month);
                 Assert.Equal(DateTime.Now.Day, profileData.DateOfBirth!.Value.Day);
                 Assert.Equal(Gender.Female, profileData.Gender);
+                Assert.Equal(TestConstants.TestLocation.City, profileData.Location!.City);
 
                 await TestUtils.LoginAsUser(_client, "SomeUsername2");
 
@@ -43,6 +45,7 @@ namespace EntwineBackend_Tests
                 Assert.Equal("SomeUsername1", otherProfileData!.Username);
                 Assert.Equal(24, otherProfileData.Age);
                 Assert.Equal(Gender.Female, otherProfileData.Gender);
+                Assert.Equal(TestConstants.TestLocation.City, otherProfileData.Location!.City);
             }
             finally
             {
