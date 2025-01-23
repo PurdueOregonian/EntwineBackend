@@ -94,7 +94,9 @@ namespace Friends5___Backend.Services
             }
             else
             {
-                //create new location and return Id
+                // Create new location and return Id
+                // We also need to add a Community
+                int locationId;
                 sql = @"INSERT INTO public.""Locations"" (""City"", ""Country"", ""State"")
                         VALUES (@City, @Country, @State) RETURNING ""Id""";
                 using var insertCommand = dataSource.CreateCommand(sql);
@@ -104,12 +106,20 @@ namespace Friends5___Backend.Services
                 using var insertReader = insertCommand.ExecuteReader();
                 if (await insertReader.ReadAsync())
                 {
-                    return insertReader.GetInt32(0);
+                    locationId = insertReader.GetInt32(0);
                 }
                 else
                 {
                     throw new Exception("Failed to insert location");
                 }
+
+                sql = @"INSERT INTO public.""Communities"" (""Location"")
+                VALUES (@Location)";
+                using var communityCommand = dataSource.CreateCommand(sql);
+                communityCommand.Parameters.AddWithValue("@Location", locationId);
+                await communityCommand.ExecuteNonQueryAsync();
+
+                return locationId;
             }
         }
 
