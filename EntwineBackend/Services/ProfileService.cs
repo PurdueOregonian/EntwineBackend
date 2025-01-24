@@ -51,6 +51,18 @@ namespace EntwineBackend.Services
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 
+            int? currentLocation = null;
+            var selectSql = @"SELECT ""Location"" FROM public.""Profiles"" WHERE ""Id"" = @Id";
+            using (var selectCmd = dataSource.CreateCommand(selectSql))
+            {
+                selectCmd.Parameters.AddWithValue("@Id", userId);
+                using var reader = await selectCmd.ExecuteReaderAsync();
+                if (await reader.ReadAsync())
+                {
+                    currentLocation = reader.IsDBNull(0) ? null : reader.GetInt32(0);
+                }
+            }
+
             await using (var cmd = dataSource.CreateCommand(@"
                 INSERT INTO public.""Profiles""(""Id"", ""Username"", ""DateOfBirth"", ""Gender"", ""Interests"", ""Location"")
                 VALUES (@Id, @Username, @DateOfBirth, @Gender, @Interests, @Location)
@@ -78,6 +90,11 @@ namespace EntwineBackend.Services
                     cmd.Parameters.AddWithValue("@Location", data.Location);
                 }
                 await cmd.ExecuteNonQueryAsync();
+            }
+
+            if(data.Location is not null && data.Location != currentLocation)
+            {
+                await AddUserToCommunity(userId, data.Location.Value);
             }
         }
         public async Task<List<ProfileData>> SearchUsers(int userId, string searchString)
@@ -175,6 +192,32 @@ namespace EntwineBackend.Services
             else
             {
                 return null;
+            }
+        }
+
+        private async Task AddUserToCommunity(int userId, int locationId)
+        {
+            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+
+            var selectSql = @"SELECT ""Id"", ""UserIds"" FROM public.""Communities"" WHERE ""Location"" = @Location";
+            using var selectCmd = dataSource.CreateCommand(selectSql);
+            selectCmd.Parameters.AddWithValue("@Location", locationId);
+            using var reader = await selectCmd.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                var communityId = reader.GetInt32(0);
+                var userIds = reader.IsDBNull(1) ? new List<int>() : reader.GetFieldValue<List<int>>(1);
+
+                if (!userIds.Contains(userId))
+                {
+                    userIds.Add(userId);
+
+                    var updateSql = @"UPDATE public.""Communities"" SET ""UserIds"" = @UserIds WHERE ""Id"" = @Id";
+                    using var updateCmd = dataSource.CreateCommand(updateSql);
+                    updateCmd.Parameters.AddWithValue("@UserIds", userIds);
+                    updateCmd.Parameters.AddWithValue("@Id", communityId);
+                    await updateCmd.ExecuteNonQueryAsync();
+                }
             }
         }
     }
