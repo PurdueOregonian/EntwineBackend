@@ -2,10 +2,8 @@
 
 namespace Friends5___Backend.Services
 {
-    public interface ILocationService
+    public interface ICommunityService
     {
-        public Task<Location?> GetLocation(string latitude, string longitude);
-        public Task<int> GetLocationId(InputLocation location);
-        public Task<Location?> GetLocationById(int id);
+        public Task<Community?> GetCommunity(int userId);
     }
 }

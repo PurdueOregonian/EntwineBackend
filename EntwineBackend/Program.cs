@@ -29,6 +29,7 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IInterestService, InterestService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<IAuthorizationHandler, UserInChatRequirementHandler>();
 builder.Services.AddSingleton<TokenBlacklist>();
 builder.Services.AddHttpClient();
