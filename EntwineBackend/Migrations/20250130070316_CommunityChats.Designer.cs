@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using EntwineBackend.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Friends5___Backend.Migrations
 {
     [DbContext(typeof(FriendsDbContext))]
-    partial class FriendsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250130070316_CommunityChats")]
+    partial class CommunityChats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
