@@ -12,7 +12,9 @@ namespace EntwineBackend.DbContext
 
         public DbSet<ProfileData> Profiles { get; set; }
         public DbSet<Chat> Chats { get; set; }
+        public DbSet<CommunityChat> CommunityChats { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<CommunityChatMessage> CommunityChatMessages { get; set; }
         public DbSet<Community> Communities { get; set; }
         public DbSet<InterestCategory> InterestCategories { get; set; }
         public DbSet<Interest> Interests { get; set; }

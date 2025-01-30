@@ -1,5 +1,6 @@
 ﻿using EntwineBackend.DbItems;
 using Npgsql;
+using System.Text;
 using System.Text.Json.Nodes;
 
 namespace Friends5___Backend.Services
@@ -113,11 +114,7 @@ namespace Friends5___Backend.Services
                     throw new Exception("Failed to insert location");
                 }
 
-                sql = @"INSERT INTO public.""Communities"" (""Location"")
-                VALUES (@Location)";
-                using var communityCommand = dataSource.CreateCommand(sql);
-                communityCommand.Parameters.AddWithValue("@Location", locationId);
-                await communityCommand.ExecuteNonQueryAsync();
+                await CreateNewCommunity(dataSource, locationId);
 
                 return locationId;
             }
@@ -144,6 +141,35 @@ namespace Friends5___Backend.Services
             {
                 return null;
             }
+        }
+
+        private async Task CreateNewCommunity(NpgsqlDataSource dataSource, int locationId)
+        {
+            var sql = @"INSERT INTO public.""Communities"" (""Location"")
+                VALUES (@Location)";
+            using var communityCommand = dataSource.CreateCommand(sql);
+            communityCommand.Parameters.AddWithValue("@Location", locationId);
+            await communityCommand.ExecuteNonQueryAsync();
+
+            // Now we need to create the default chats for the community
+            var interestCategories = Constants.InterestCategories;
+            var insertChatsSql = new StringBuilder("INSERT INTO public.\"CommunityChats\" (\"Name\", \"Community\") VALUES ");
+            var parameters = new List<NpgsqlParameter>();
+
+            // for each interest category, create a chat
+            for (int i = 0; i < interestCategories.Length; i++)
+            {
+                insertChatsSql.Append($"(@Name{i}, @Community{i}),");
+                parameters.Add(new NpgsqlParameter($"@Name{i}", interestCategories[i].Name));
+                parameters.Add(new NpgsqlParameter($"@Community{i}", locationId));
+            }
+
+            // Remove the trailing comma
+            insertChatsSql.Length--;
+
+            using var chatCommand = dataSource.CreateCommand(insertChatsSql.ToString());
+            chatCommand.Parameters.AddRange(parameters.ToArray());
+            await chatCommand.ExecuteNonQueryAsync();
         }
     }
 }
