@@ -1,6 +1,5 @@
 ﻿using EntwineBackend.DbItems;
 using EntwineBackend.UserId;
-using EntwineBackend;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,7 +7,19 @@ namespace EntwineBackend.DbContext
 {
     public class FriendsDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
-        public FriendsDbContext(DbContextOptions options) : base(options) { }
+        public FriendsDbContext(DbContextOptions options) : base(options)
+        {
+            Profiles = Set<ProfileData>();
+            Chats = Set<Chat>();
+            CommunityChats = Set<CommunityChat>();
+            Messages = Set<Message>();
+            CommunityChatMessages = Set<CommunityChatMessage>();
+            Communities = Set<Community>();
+            InterestCategories = Set<InterestCategory>();
+            Interests = Set<Interest>();
+            Locations = Set<Location>();
+            ApplicationUserLogins = Set<ApplicationUserLogin>();
+        }
 
         public DbSet<ProfileData> Profiles { get; set; }
         public DbSet<Chat> Chats { get; set; }

@@ -1,48 +1,70 @@
 ﻿using EntwineBackend.DbItems;
+using EntwineBackend.Data;
 using Npgsql;
+using EntwineBackend.DbContext;
 
 namespace EntwineBackend.Services
 {
     public class CommunityService : ICommunityService
     {
         private string _connectionString;
+        private readonly FriendsDbContext _friendsDbContext;
 
-        public CommunityService(IConfiguration config)
+        public CommunityService(
+            IConfiguration config,
+            FriendsDbContext friendsDbContext)
         {
             _connectionString = config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
+            _friendsDbContext = friendsDbContext;
         }
 
-        public async Task<Community?> GetCommunity(int userId)
+        public async Task<CommunityData?> GetCommunity(int userId)
         {
-            // Get the community the user is a part of. Subject to change
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-            var userLocationSql = @"SELECT ""Location"" FROM public.""Profiles"" WHERE ""Id"" = @userId";
-            await using var userLocationCommand = dataSource.CreateCommand(userLocationSql);
-            userLocationCommand.Parameters.AddWithValue("@userId", userId);
-            var userLocation = await userLocationCommand.ExecuteScalarAsync();
-            if (userLocation == null)
+            var profile = _friendsDbContext.Profiles.FirstOrDefault(p => p.Id == userId);
+            if (profile == null)
             {
                 return null;
             }
+            var userLocationId = profile.Location;
+            if (userLocationId == null)
+            {
+                return null;
+            }
+            var location = _friendsDbContext.Locations.FirstOrDefault(l => l.Id == userLocationId);
 
-            var sql = @"SELECT * FROM public.""Communities"" WHERE ""Location"" = @userLocation";
+            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+            var sql = @"SELECT * FROM public.""Communities"" WHERE ""Location"" = @userLocationId";
             await using var command = dataSource.CreateCommand(sql);
-            command.Parameters.AddWithValue("@userLocation", userLocation);
+            command.Parameters.AddWithValue("@userLocationId", userLocationId);
             await using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                var community = new Community
-                {
-                    Id = reader.GetInt32(0),
-                    Location = reader.GetInt32(1),
-                    UserIds = reader.GetFieldValue<List<int>>(2)
-                };
-                return community;
-            }
-            else
+            if (!await reader.ReadAsync())
             {
                 return null;
             }
+            var community = new Community
+            {
+                Id = reader.GetInt32(0),
+                Location = reader.GetInt32(1),
+                UserIds = reader.GetFieldValue<List<int>>(2)
+            };
+
+            var communityChats = _friendsDbContext.CommunityChats
+                .Where(chat => chat.Community == community.Id)
+                .Select(chat => new CommunityChatData
+                {
+                    Id = chat.Id,
+                    Name = chat.Name
+                })
+                .ToList();
+
+            return new CommunityData
+            {
+                State = location.State,
+                City = location.City,
+                Country = location.Country,
+                UserIds = community.UserIds,
+                Chats = communityChats
+            };
         }
     }
 }

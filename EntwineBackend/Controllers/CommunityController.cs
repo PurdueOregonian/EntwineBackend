@@ -17,8 +17,6 @@ namespace EntwineBackend.Controllers
             _communityService = communityService;
         }
 
-        
-
         [HttpGet]
         public async Task<IActionResult> GetCommunityAsync()
         {

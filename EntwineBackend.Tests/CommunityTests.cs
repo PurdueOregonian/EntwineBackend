@@ -27,19 +27,25 @@ namespace EntwineBackend_Tests
                 var response = await _client.GetAsync(requestUrl);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var community = JsonSerializer.Deserialize<Community>(responseContent, DefaultJsonOptions.Instance);
-                Assert.Equal(1, community!.Id);
-                Assert.Equal(1, community.Location);
+                var community = JsonSerializer.Deserialize<CommunityData>(responseContent, DefaultJsonOptions.Instance);
+                Assert.Equal(TestConstants.TestLocation.Country, community!.Country);
+                Assert.Equal(TestConstants.TestLocation.State, community.State);
+                Assert.Equal(TestConstants.TestLocation.City, community.City);
                 Assert.Equal([1, 2, 3], community.UserIds);
+                Assert.Equal(Constants.InterestCategories.Length, community.Chats!.Count);
+                Assert.True(community.Chats.Count(c => c.Name == Constants.InterestCategories[0].Name) == 1);
 
                 await TestUtils.LoginAsUser(_client, "SomeUsername4");
                 response = await _client.GetAsync(requestUrl);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 responseContent = await response.Content.ReadAsStringAsync();
-                community = JsonSerializer.Deserialize<Community>(responseContent, DefaultJsonOptions.Instance);
-                Assert.Equal(2, community!.Id);
-                Assert.Equal(2, community.Location);
+                community = JsonSerializer.Deserialize<CommunityData>(responseContent, DefaultJsonOptions.Instance);
+                Assert.Equal(TestConstants.TestLocation2.Country, community!.Country);
+                Assert.Equal(TestConstants.TestLocation2.State, community.State);
+                Assert.Equal(TestConstants.TestLocation2.City, community.City);
                 Assert.Equal([4, 5], community.UserIds);
+                Assert.Equal(Constants.InterestCategories.Length, community.Chats!.Count);
+                Assert.True(community.Chats.Count(c => c.Name == Constants.InterestCategories[0].Name) == 1);
             }
             finally
             {
