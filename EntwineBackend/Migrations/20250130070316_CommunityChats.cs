@@ -5,7 +5,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Friends5___Backend.Migrations
+namespace EntwineBackend.Migrations
 {
     /// <inheritdoc />
     public partial class CommunityChats : Migration

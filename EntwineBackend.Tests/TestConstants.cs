@@ -1,6 +1,6 @@
 ﻿using EntwineBackend.DbItems;
 
-namespace Friends5___Backend_Tests
+namespace EntwineBackend_Tests
 {
     internal static class TestConstants
     {

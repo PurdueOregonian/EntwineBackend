@@ -1,9 +1,9 @@
 ﻿using EntwineBackend;
 using EntwineBackend.Authentication;
 using EntwineBackend.DbItems;
-using Friends5___Backend;
-using Friends5___Backend.Data;
-using Friends5___Backend_Tests;
+using EntwineBackend;
+using EntwineBackend.Data;
+using EntwineBackend_Tests;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using System.Net;

@@ -3,7 +3,7 @@ using Npgsql;
 using System.Text;
 using System.Text.Json.Nodes;
 
-namespace Friends5___Backend.Services
+namespace EntwineBackend.Services
 {
     public class LocationService : ILocationService
     {

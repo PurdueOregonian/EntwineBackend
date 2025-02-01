@@ -1,8 +1,8 @@
 ﻿using EntwineBackend;
 using EntwineBackend.DbItems;
-using Friends5___Backend;
-using Friends5___Backend.Data;
-using Friends5___Backend_Tests;
+using EntwineBackend;
+using EntwineBackend.Data;
+using EntwineBackend_Tests;
 using System.Net;
 using System.Text;
 using System.Text.Json;

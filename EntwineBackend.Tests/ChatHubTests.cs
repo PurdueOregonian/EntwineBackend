@@ -1,6 +1,6 @@
 ﻿using EntwineBackend;
 using EntwineBackend.DbItems;
-using Friends5___Backend.Data;
+using EntwineBackend.Data;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.TestHost;
 using System.Net;

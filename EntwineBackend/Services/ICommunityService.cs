@@ -1,6 +1,6 @@
 ﻿using EntwineBackend.DbItems;
 
-namespace Friends5___Backend.Services
+namespace EntwineBackend.Services
 {
     public interface ILocationService
     {

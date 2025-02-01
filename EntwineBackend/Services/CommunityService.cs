@@ -1,7 +1,7 @@
 ﻿using EntwineBackend.DbItems;
 using Npgsql;
 
-namespace Friends5___Backend.Services
+namespace EntwineBackend.Services
 {
     public class CommunityService : ICommunityService
     {

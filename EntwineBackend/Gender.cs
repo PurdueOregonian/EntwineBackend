@@ -1,4 +1,4 @@
-﻿namespace Friends5___Backend
+﻿namespace EntwineBackend
 {
     public enum Gender
     {

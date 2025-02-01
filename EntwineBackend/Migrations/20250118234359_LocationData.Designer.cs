@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Friends5___Backend.Migrations
+namespace EntwineBackend.Migrations
 {
     [DbContext(typeof(FriendsDbContext))]
     [Migration("20250118234359_LocationData")]

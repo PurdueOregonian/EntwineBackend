@@ -1,4 +1,4 @@
-﻿namespace Friends5___Backend.Data
+﻿namespace EntwineBackend.Data
 {
     public class ServiceInputProfileData
     {

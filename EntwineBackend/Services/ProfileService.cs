@@ -1,7 +1,7 @@
 ﻿using EntwineBackend.DbItems;
-using Friends5___Backend;
-using Friends5___Backend.Data;
-using Friends5___Backend.Services;
+using EntwineBackend;
+using EntwineBackend.Data;
+using EntwineBackend.Services;
 using Npgsql;
 using NpgsqlTypes;
 

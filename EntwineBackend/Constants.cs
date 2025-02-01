@@ -1,6 +1,6 @@
 ﻿using EntwineBackend.DbItems;
 
-namespace Friends5___Backend
+namespace EntwineBackend
 {
     public static class Constants
     {

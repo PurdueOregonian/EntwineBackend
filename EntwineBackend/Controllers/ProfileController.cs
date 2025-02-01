@@ -1,7 +1,7 @@
 using EntwineBackend.DbItems;
 using EntwineBackend.Services;
-using Friends5___Backend.Data;
-using Friends5___Backend.Services;
+using EntwineBackend.Data;
+using EntwineBackend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;

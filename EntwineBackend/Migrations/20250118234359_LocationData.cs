@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Friends5___Backend.Migrations
+namespace EntwineBackend.Migrations
 {
     /// <inheritdoc />
     public partial class LocationData : Migration
