@@ -1,4 +1,5 @@
-﻿using EntwineBackend.DbItems;
+﻿using EntwineBackend.DbContext;
+using EntwineBackend.DbItems;
 using Npgsql;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -9,13 +10,13 @@ namespace EntwineBackend.Services
     {
         IHttpClientFactory _httpClientFactory;
         private readonly string _apiKey;
-        private string _connectionString;
+        private readonly EntwineDbContext _dbContext;
 
-        public LocationService(IHttpClientFactory httpClientFactory, IConfiguration config)
+        public LocationService(IHttpClientFactory httpClientFactory, EntwineDbContext dbContext)
         {
             _httpClientFactory = httpClientFactory;
             _apiKey = ReadApiKeyFromFile("./ApiKey.txt");
-            _connectionString = config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
+            _dbContext = dbContext;
         }
 
         private string ReadApiKeyFromFile(string filePath)
@@ -81,95 +82,57 @@ namespace EntwineBackend.Services
 
         public async Task<int> GetLocationId(InputLocation location)
         {
-            using var dataSource = NpgsqlDataSource.Create(_connectionString);
-            var sql = @"SELECT ""Id"" FROM public.""Locations""
-                        WHERE ""City"" = @City AND ""Country"" = @Country AND ""State"" = @State";
-            using var command = dataSource.CreateCommand(sql);
-            command.Parameters.AddWithValue("@City", location.City);
-            command.Parameters.AddWithValue("@Country", location.Country);
-            command.Parameters.AddWithValue("@State", location.State);
-            using var reader = command.ExecuteReader();
-            if (reader.Read())
+            var matchingLocation = _dbContext.Locations.FirstOrDefault(
+                l => l.City == location.City && l.Country == location.Country && l.State == location.State);
+            if (matchingLocation != null)
             {
-                return reader.GetInt32(0);
+                return matchingLocation.Id;
             }
             else
             {
                 // Create new location and return Id
                 // We also need to add a Community
-                int locationId;
-                sql = @"INSERT INTO public.""Locations"" (""City"", ""Country"", ""State"")
-                        VALUES (@City, @Country, @State) RETURNING ""Id""";
-                using var insertCommand = dataSource.CreateCommand(sql);
-                insertCommand.Parameters.AddWithValue("@City", location.City);
-                insertCommand.Parameters.AddWithValue("@Country", location.Country);
-                insertCommand.Parameters.AddWithValue("@State", location.State);
-                using var insertReader = insertCommand.ExecuteReader();
-                if (await insertReader.ReadAsync())
+                var newLocation = new Location
                 {
-                    locationId = insertReader.GetInt32(0);
-                }
-                else
-                {
-                    throw new Exception("Failed to insert location");
-                }
+                    City = location.City,
+                    Country = location.Country,
+                    State = location.State
+                };
+                _dbContext.Locations.Add(newLocation);
+                await _dbContext.SaveChangesAsync();
 
-                await CreateNewCommunity(dataSource, locationId);
+                // The newLocation.Id will be populated with the generated ID
+                await CreateNewCommunity(newLocation.Id);
 
-                return locationId;
+                return newLocation.Id;
             }
         }
 
         public async Task<Location?> GetLocationById(int locationId)
         {
-            using var dataSource = NpgsqlDataSource.Create(_connectionString);
-            var sql = @"SELECT ""City"", ""Country"", ""State"" FROM public.""Locations""
-                        WHERE ""Id"" = @Id";
-            using var command = dataSource.CreateCommand(sql);
-            command.Parameters.AddWithValue("@Id", locationId);
-            using var reader = command.ExecuteReader();
-            if (await reader.ReadAsync())
-            {
-                return new Location
-                {
-                    City = reader.GetString(0),
-                    Country = reader.GetString(1),
-                    State = reader.GetString(2)
-                };
-            }
-            else
-            {
-                return null;
-            }
+            return _dbContext.Locations.FirstOrDefault(l => l.Id == locationId);
         }
 
-        private async Task CreateNewCommunity(NpgsqlDataSource dataSource, int locationId)
+        private async Task CreateNewCommunity(int locationId)
         {
-            var sql = @"INSERT INTO public.""Communities"" (""Location"")
-                VALUES (@Location)";
-            using var communityCommand = dataSource.CreateCommand(sql);
-            communityCommand.Parameters.AddWithValue("@Location", locationId);
-            await communityCommand.ExecuteNonQueryAsync();
-
-            // Now we need to create the default chats for the community
-            var interestCategories = Constants.InterestCategories;
-            var insertChatsSql = new StringBuilder("INSERT INTO public.\"CommunityChats\" (\"Name\", \"Community\") VALUES ");
-            var parameters = new List<NpgsqlParameter>();
-
-            // for each interest category, create a chat
-            for (int i = 0; i < interestCategories.Length; i++)
+            var community = new Community
             {
-                insertChatsSql.Append($"(@Name{i}, @Community{i}),");
-                parameters.Add(new NpgsqlParameter($"@Name{i}", interestCategories[i].Name));
-                parameters.Add(new NpgsqlParameter($"@Community{i}", locationId));
-            }
+                Location = locationId,
+                UserIds = []
+            };
+            _dbContext.Communities.Add(community);
+            await _dbContext.SaveChangesAsync();
 
-            // Remove the trailing comma
-            insertChatsSql.Length--;
-
-            using var chatCommand = dataSource.CreateCommand(insertChatsSql.ToString());
-            chatCommand.Parameters.AddRange(parameters.ToArray());
-            await chatCommand.ExecuteNonQueryAsync();
+            // Now we need to create the default chats for the community. For each interest category, create a chat
+            var defaultChats = Constants.InterestCategories.Select(category =>
+                new CommunityChat
+                {
+                    Name = category.Name,
+                    Community = community.Id
+                }
+            ).ToList();
+            _dbContext.CommunityChats.AddRange(defaultChats);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
