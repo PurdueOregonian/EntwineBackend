@@ -34,12 +34,12 @@ builder.Services.AddScoped<IAuthorizationHandler, UserInChatRequirementHandler>(
 builder.Services.AddSingleton<TokenBlacklist>();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
-builder.Services.AddDbContext<FriendsDbContext>(options => {
+builder.Services.AddDbContext<EntwineDbContext>(options => {
     options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:DefaultConnection"));
 });
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
-    .AddEntityFrameworkStores<FriendsDbContext>()
+    .AddEntityFrameworkStores<EntwineDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddCors(options =>

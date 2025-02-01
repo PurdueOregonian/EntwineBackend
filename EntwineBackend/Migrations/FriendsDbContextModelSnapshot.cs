@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace EntwineBackend.Migrations
 {
-    [DbContext(typeof(FriendsDbContext))]
+    [DbContext(typeof(EntwineDbContext))]
     partial class FriendsDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace EntwineBackend.Migrations
 {
-    [DbContext(typeof(FriendsDbContext))]
+    [DbContext(typeof(EntwineDbContext))]
     [Migration("20250115062910_InitialCreate")]
     partial class InitialCreate
     {

@@ -8,19 +8,19 @@ namespace EntwineBackend.Services
     public class CommunityService : ICommunityService
     {
         private string _connectionString;
-        private readonly FriendsDbContext _friendsDbContext;
+        private readonly EntwineDbContext _entwineDbContext;
 
         public CommunityService(
             IConfiguration config,
-            FriendsDbContext friendsDbContext)
+            EntwineDbContext entwineDbContext)
         {
             _connectionString = config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
-            _friendsDbContext = friendsDbContext;
+            _entwineDbContext = entwineDbContext;
         }
 
         public async Task<CommunityData?> GetCommunity(int userId)
         {
-            var profile = _friendsDbContext.Profiles.FirstOrDefault(p => p.Id == userId);
+            var profile = _entwineDbContext.Profiles.FirstOrDefault(p => p.Id == userId);
             if (profile == null)
             {
                 return null;
@@ -30,7 +30,7 @@ namespace EntwineBackend.Services
             {
                 return null;
             }
-            var location = _friendsDbContext.Locations.FirstOrDefault(l => l.Id == userLocationId);
+            var location = _entwineDbContext.Locations.FirstOrDefault(l => l.Id == userLocationId);
 
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
             var sql = @"SELECT * FROM public.""Communities"" WHERE ""Location"" = @userLocationId";
@@ -48,7 +48,7 @@ namespace EntwineBackend.Services
                 UserIds = reader.GetFieldValue<List<int>>(2)
             };
 
-            var communityChats = _friendsDbContext.CommunityChats
+            var communityChats = _entwineDbContext.CommunityChats
                 .Where(chat => chat.Community == community.Id)
                 .Select(chat => new CommunityChatData
                 {

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace EntwineBackend.Migrations
 {
-    [DbContext(typeof(FriendsDbContext))]
+    [DbContext(typeof(EntwineDbContext))]
     [Migration("20250118234359_LocationData")]
     partial class LocationData
     {

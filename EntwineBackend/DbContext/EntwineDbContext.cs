@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EntwineBackend.DbContext
 {
-    public class FriendsDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
+    public class EntwineDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
-        public FriendsDbContext(DbContextOptions options) : base(options)
+        public EntwineDbContext(DbContextOptions options) : base(options)
         {
             Profiles = Set<ProfileData>();
             Chats = Set<Chat>();
