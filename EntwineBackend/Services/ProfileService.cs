@@ -4,99 +4,60 @@ using EntwineBackend.Data;
 using EntwineBackend.Services;
 using Npgsql;
 using NpgsqlTypes;
+using EntwineBackend.DbContext;
 
 namespace EntwineBackend.Services
 {
     public class ProfileService : IProfileService
     {
         private string _connectionString;
+        private readonly EntwineDbContext _dbContext;
 
-        public ProfileService(IConfiguration config)
+        public ProfileService(IConfiguration config, EntwineDbContext dbContext)
         {
             _connectionString = config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
+            _dbContext = dbContext;
         }
 
         public async Task<ProfileData?> GetProfile(int userId)
         {
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-
-            var sql = @"SELECT * FROM public.""Profiles""
-                        WHERE ""Profiles"".""Id"" = @Id";
-
-            using var command = dataSource.CreateCommand(sql);
-
-            command.Parameters.AddWithValue("@Id", userId);
-
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                var profile = new ProfileData
-                {
-                    Id = reader.GetInt32(0),
-                    Username = reader.GetString(1),
-                    DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(2)),
-                    Gender = (Gender)reader.GetInt32(3),
-                    Interests = reader.GetFieldValue<List<int>>(4),
-                    Location = reader.IsDBNull(5) ? null : reader.GetInt32(5)
-                };
-                return profile;
-            }
-            else
-            {
-                return null;
-            }
+            return _dbContext.Profiles.FirstOrDefault(p => p.Id == userId);
         }
 
         public async Task SaveProfile(int userId, string username, ServiceInputProfileData data)
         {
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
+            var currentProfile = _dbContext.Profiles.FirstOrDefault(p => p.Id == userId);
+            var currentLocation = currentProfile?.Location;
 
-            int? currentLocation = null;
-            var selectSql = @"SELECT ""Location"" FROM public.""Profiles"" WHERE ""Id"" = @Id";
-            using (var selectCmd = dataSource.CreateCommand(selectSql))
+            if (currentProfile != null)
             {
-                selectCmd.Parameters.AddWithValue("@Id", userId);
-                using var reader = await selectCmd.ExecuteReaderAsync();
-                if (await reader.ReadAsync())
-                {
-                    currentLocation = reader.IsDBNull(0) ? null : reader.GetInt32(0);
-                }
+                currentProfile.Username = username;
+                currentProfile.DateOfBirth = data.DateOfBirth;
+                currentProfile.Gender = data.Gender;
+                currentProfile.Interests = data.Interests;
+                currentProfile.Location = data.Location;
+                _dbContext.Profiles.Update(currentProfile);
             }
-
-            await using (var cmd = dataSource.CreateCommand(@"
-                INSERT INTO public.""Profiles""(""Id"", ""Username"", ""DateOfBirth"", ""Gender"", ""Interests"", ""Location"")
-                VALUES (@Id, @Username, @DateOfBirth, @Gender, @Interests, @Location)
-                ON CONFLICT (""Id"") 
-                DO UPDATE 
-                SET ""DateOfBirth"" = EXCLUDED.""DateOfBirth"", ""Gender"" = EXCLUDED.""Gender"", ""Interests"" = EXCLUDED.""Interests"", ""Location"" = EXCLUDED.""Location"";
-            "))
+            else
             {
-                cmd.Parameters.AddWithValue("@Id", userId);
-                cmd.Parameters.AddWithValue("@Username", username);
-                if (data.DateOfBirth is not null)
+                var newProfile = new ProfileData
                 {
-                    cmd.Parameters.AddWithValue("@DateOfBirth", data.DateOfBirth);
-                }
-                if (data.Gender is not null)
-                {
-                    cmd.Parameters.AddWithValue("@Gender", (int)data.Gender);
-                }
-                if (data.Interests is not null)
-                {
-                    cmd.Parameters.AddWithValue("@Interests", data.Interests);
-                }
-                if (data.Location is not null)
-                {
-                    cmd.Parameters.AddWithValue("@Location", data.Location);
-                }
-                await cmd.ExecuteNonQueryAsync();
+                    Username = username,
+                    DateOfBirth = data.DateOfBirth,
+                    Gender = data.Gender,
+                    Interests = data.Interests,
+                    Location = data.Location
+                };
+                _dbContext.Profiles.Add(newProfile);
             }
+            await _dbContext.SaveChangesAsync();
 
-            if(data.Location is not null && data.Location != currentLocation)
+            if (data.Location is not null && data.Location != currentLocation)
             {
                 await AddUserToCommunity(userId, data.Location.Value);
             }
         }
+
         public async Task<List<ProfileData>> SearchUsers(int userId, string searchString)
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
@@ -176,48 +137,18 @@ namespace EntwineBackend.Services
 
         public async Task<string?> GetUsernameFromId(int id)
         {
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-
-            var sql = @"SELECT ""Username"" FROM public.""Profiles""
-                        WHERE ""Id"" = @Id";
-
-            using var command = dataSource.CreateCommand(sql);
-            command.Parameters.AddWithValue("@Id", id);
-
-            using var reader = await command.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
-            {
-                return reader.GetString(0);
-            }
-            else
-            {
-                return null;
-            }
+            return _dbContext.Profiles.FirstOrDefault(p => p.Id == id)?.Username;
         }
 
         private async Task AddUserToCommunity(int userId, int locationId)
         {
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-
-            var selectSql = @"SELECT ""Id"", ""UserIds"" FROM public.""Communities"" WHERE ""Location"" = @Location";
-            using var selectCmd = dataSource.CreateCommand(selectSql);
-            selectCmd.Parameters.AddWithValue("@Location", locationId);
-            using var reader = await selectCmd.ExecuteReaderAsync();
-            if (await reader.ReadAsync())
+            var community = _dbContext.Communities.FirstOrDefault(c => c.Location == locationId);
+            if(community != null && community.UserIds != null && !community.UserIds.Contains(userId))
             {
-                var communityId = reader.GetInt32(0);
-                var userIds = reader.IsDBNull(1) ? new List<int>() : reader.GetFieldValue<List<int>>(1);
-
-                if (!userIds.Contains(userId))
-                {
-                    userIds.Add(userId);
-
-                    var updateSql = @"UPDATE public.""Communities"" SET ""UserIds"" = @UserIds WHERE ""Id"" = @Id";
-                    using var updateCmd = dataSource.CreateCommand(updateSql);
-                    updateCmd.Parameters.AddWithValue("@UserIds", userIds);
-                    updateCmd.Parameters.AddWithValue("@Id", communityId);
-                    await updateCmd.ExecuteNonQueryAsync();
-                }
+                var newUserIds = community.UserIds.Append(userId).ToList();
+                community.UserIds = newUserIds;
+                _dbContext.Communities.Update(community);
+                await _dbContext.SaveChangesAsync();
             }
         }
     }
