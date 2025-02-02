@@ -18,17 +18,17 @@ namespace EntwineBackend.Controllers
         }
 
         [HttpGet("Category")]
-        public async Task<IActionResult> GetInterestCategories()
+        public IActionResult GetInterestCategories()
         {
-            var categories = await _interestService.GetInterestCategories();
+            var categories = _interestService.GetInterestCategories();
 
             return Ok(categories);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetInterests()
+        public IActionResult GetInterests()
         {
-            var interests = await _interestService.GetInterests();
+            var interests = _interestService.GetInterests();
 
             return Ok(interests);
         }

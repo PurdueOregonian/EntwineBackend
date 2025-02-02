@@ -5,14 +5,11 @@ namespace EntwineBackend.Services
 {
     public class CommunityService : ICommunityService
     {
-        private string _connectionString;
         private readonly EntwineDbContext _dbContext;
 
         public CommunityService(
-            IConfiguration config,
             EntwineDbContext entwineDbContext)
         {
-            _connectionString = config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
             _dbContext = entwineDbContext;
         }
 

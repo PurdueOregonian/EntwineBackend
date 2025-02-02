@@ -1,58 +1,26 @@
-﻿using EntwineBackend.DbItems;
+﻿using EntwineBackend.DbContext;
+using EntwineBackend.DbItems;
 using Npgsql;
 
 namespace EntwineBackend.Services
 {
     public class InterestService : IInterestService
     {
-        private string _connectionString;
+        private readonly EntwineDbContext _dbContext;
 
-        public InterestService(IConfiguration config)
+        public InterestService(EntwineDbContext dbContext)
         {
-            _connectionString = config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
+            _dbContext = dbContext;
         }
 
-        public async Task<List<InterestCategory>> GetInterestCategories()
+        public List<InterestCategory> GetInterestCategories()
         {
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-
-            var sql = @"SELECT * FROM public.""InterestCategories""";
-            using var reader = await dataSource.CreateCommand(sql).ExecuteReaderAsync();
-
-            var interestCategories = new List<InterestCategory>();
-            while (await reader.ReadAsync())
-            {
-                var interestCategory = new InterestCategory
-                {
-                    Id = reader.GetInt32(0),
-                    Name = reader.GetString(1)
-                };
-                interestCategories.Add(interestCategory);
-            }
-
-            return interestCategories;
+            return [.. _dbContext.InterestCategories];
         }
 
-        public async Task<List<Interest>> GetInterests()
+        public List<Interest> GetInterests()
         {
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-
-            var sql = @"SELECT * FROM public.""Interests""";
-            using var reader = await dataSource.CreateCommand(sql).ExecuteReaderAsync();
-
-            var interests = new List<Interest>();
-            while (await reader.ReadAsync())
-            {
-                var interest = new Interest
-                {
-                    Id = reader.GetInt32(0),
-                    Categories = reader.GetFieldValue<List<int>>(1),
-                    Name = reader.GetString(2)
-                };
-                interests.Add(interest);
-            }
-
-            return interests;
+            return [.. _dbContext.Interests];
         }
     }
 }

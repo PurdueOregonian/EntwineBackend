@@ -4,7 +4,7 @@ namespace EntwineBackend.Services
 {
     public interface IInterestService
     {
-        public Task<List<Interest>> GetInterests();
-        public Task<List<InterestCategory>> GetInterestCategories();
+        public List<Interest> GetInterests();
+        public List<InterestCategory> GetInterestCategories();
     }
 }
