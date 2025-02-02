@@ -1,7 +1,6 @@
 using EntwineBackend.DbItems;
 using EntwineBackend.Services;
 using EntwineBackend.Data;
-using EntwineBackend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -46,7 +45,7 @@ namespace EntwineBackend.Controllers
                 DateOfBirth = profile.DateOfBirth,
                 Gender = profile.Gender,
                 Interests = profile.Interests,
-                Location = profile.Location == null ? null : await _locationService.GetLocationById(profile.Location.Value)
+                Location = profile.Location == null ? null : _locationService.GetLocationById(profile.Location.Value)
             };
 
             return Ok(ownProfileReturnData);
@@ -68,7 +67,7 @@ namespace EntwineBackend.Controllers
                 Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
                 Gender = profile.Gender,
                 Interests = profile.Interests,
-                Location = profile.Location == null ? null : await _locationService.GetLocationById(profile.Location.Value)
+                Location = profile.Location == null ? null : _locationService.GetLocationById(profile.Location.Value)
             };
             return Ok(dataToReturn);
         }

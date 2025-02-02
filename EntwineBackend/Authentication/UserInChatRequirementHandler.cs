@@ -36,7 +36,7 @@ namespace EntwineBackend.Authentication
                 return;
             }
 
-            var chat = await _chatService.GetChat(chatId);
+            var chat = _chatService.GetChat(chatId);
 
             if (chat is null || chat.UserIds is null)
             {

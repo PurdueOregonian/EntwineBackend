@@ -47,11 +47,11 @@ namespace EntwineBackend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetChats()
+        public IActionResult GetChats()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var chats = await _chatService.GetChats(userId);
+            var chats = _chatService.GetChats(userId);
 
             var chatDatas = new List<ChatData>();
             foreach (var chat in chats)
@@ -79,9 +79,9 @@ namespace EntwineBackend.Controllers
         }
 
         [HttpGet("{chatId}/Messages")]
-        public async Task<IActionResult> GetMessages([FromRoute] int chatId)
+        public IActionResult GetMessages([FromRoute] int chatId)
         {
-            var chat = await _chatService.GetChat(chatId);
+            var chat = _chatService.GetChat(chatId);
 
             if(chat is null)
             {
@@ -100,7 +100,7 @@ namespace EntwineBackend.Controllers
                 return NotFound();
             }
 
-            var messages = await _chatService.GetMessages(chatId);
+            var messages = _chatService.GetMessages(chatId);
 
             return Ok(messages);
         }
@@ -113,7 +113,7 @@ namespace EntwineBackend.Controllers
                 return BadRequest();
             }
 
-            var chat = await _chatService.GetChat(chatId);
+            var chat = _chatService.GetChat(chatId);
             if (chat is null)
             {
                 return NotFound();

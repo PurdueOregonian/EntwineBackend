@@ -108,7 +108,7 @@ namespace EntwineBackend.Services
             }
         }
 
-        public async Task<Location?> GetLocationById(int locationId)
+        public Location? GetLocationById(int locationId)
         {
             return _dbContext.Locations.FirstOrDefault(l => l.Id == locationId);
         }

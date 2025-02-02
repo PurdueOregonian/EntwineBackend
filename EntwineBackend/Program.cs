@@ -4,7 +4,6 @@ using EntwineBackend.DbContext;
 using EntwineBackend.PubSub;
 using EntwineBackend.Services;
 using EntwineBackend.UserId;
-using EntwineBackend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
