@@ -18,10 +18,10 @@ namespace EntwineBackend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCommunityAsync()
+        public IActionResult GetCommunityAsync()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            return Ok(await _communityService.GetCommunity(userId));
+            return Ok(_communityService.GetCommunity(userId));
         }
     }
 }
