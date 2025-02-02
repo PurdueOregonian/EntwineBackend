@@ -62,28 +62,8 @@ namespace EntwineBackend.Services
         {
             await using var dataSource = NpgsqlDataSource.Create(_connectionString);
 
-            var users = new List<ProfileData>();
-
-            var sql = @"SELECT * FROM public.""AspNetUsers"" WHERE ""UserName"" ILIKE @SearchString";
-
-            using var command = dataSource.CreateCommand(sql);
-            command.Parameters.AddWithValue("@SearchString", $"%{searchString}%");
-
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                var user = new ProfileData
-                {
-                    Id = reader.GetInt32(0),
-                    Username = reader.GetString(1)
-                };
-                if (user.Id != userId)
-                {
-                    users.Add(user);
-                }
-            }
-
-            return users;
+            var users = _dbContext.Users.Where(user => user.UserName!.Contains(searchString) && user.Id != userId);
+            return users.Select(user => new ProfileData { Id = user.Id, Username = user.UserName }).ToList();
         }
 
         public async Task<List<ProfileData>> SearchProfiles(int userId, SearchProfileParams data)
