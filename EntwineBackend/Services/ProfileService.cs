@@ -1,25 +1,22 @@
 ﻿using EntwineBackend.DbItems;
-using EntwineBackend;
 using EntwineBackend.Data;
-using EntwineBackend.Services;
 using Npgsql;
 using NpgsqlTypes;
 using EntwineBackend.DbContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace EntwineBackend.Services
 {
     public class ProfileService : IProfileService
     {
-        private string _connectionString;
         private readonly EntwineDbContext _dbContext;
 
-        public ProfileService(IConfiguration config, EntwineDbContext dbContext)
+        public ProfileService(EntwineDbContext dbContext)
         {
-            _connectionString = config.GetValue<string>("ConnectionStrings:DefaultConnection")!;
             _dbContext = dbContext;
         }
 
-        public async Task<ProfileData?> GetProfile(int userId)
+        public ProfileData? GetProfile(int userId)
         {
             return _dbContext.Profiles.FirstOrDefault(p => p.Id == userId);
         }
@@ -58,64 +55,37 @@ namespace EntwineBackend.Services
             }
         }
 
-        public async Task<List<ProfileData>> SearchUsers(int userId, string searchString)
+        public List<ProfileData> SearchUsers(int userId, string searchString)
         {
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-
-            var users = _dbContext.Users.Where(user => user.UserName!.Contains(searchString) && user.Id != userId);
-            return users.Select(user => new ProfileData { Id = user.Id, Username = user.UserName }).ToList();
+            var matchingUsers = _dbContext.Users.Where(user => user.UserName!.Contains(searchString) && user.Id != userId);
+            return matchingUsers.Select(user => new ProfileData { Id = user.Id, Username = user.UserName }).ToList();
         }
 
-        public async Task<List<ProfileData>> SearchProfiles(int userId, SearchProfileParams data)
+        public List<ProfileData> SearchProfiles(int userId, SearchProfileParams data)
         {
-            await using var dataSource = NpgsqlDataSource.Create(_connectionString);
-
-            var profiles = new List<ProfileData>();
-
-            var query = new List<string>
+            var sqlCommand = @"SELECT * FROM public.""Profiles"" WHERE " +
+                     @"DATE_PART('year', AGE(""Profiles"".""DateOfBirth"")) >= @MinAge " +
+                     @"AND DATE_PART('year', AGE(""Profiles"".""DateOfBirth"")) <= @MaxAge ";
+            if (data.Gender != null && data.Gender.Count > 0)
             {
-                @"SELECT * FROM public.""Profiles"" WHERE",
-                @"DATE_PART('year', AGE(""Profiles"".""DateOfBirth"")) >= @MinAge",
-                @"AND DATE_PART('year', AGE(""Profiles"".""DateOfBirth"")) <= @MaxAge"
+                sqlCommand += @"AND ""Profiles"".""Gender"" = ANY(@Gender)";
+            }
+
+            var minAgeParam = new NpgsqlParameter("MinAge", data.MinAge);
+            var maxAgeParam = new NpgsqlParameter("MaxAge", data.MaxAge);
+            var gendersParam = new NpgsqlParameter("Gender", NpgsqlDbType.Array | NpgsqlDbType.Integer)
+            {
+                Value = data.Gender?.Select(g => (int)g).ToArray()
             };
 
-            if (data.Gender != null && data.Gender.Count > 0)
-            {
-                query.Add(@"AND ""Profiles"".""Gender"" = ANY(@Gender)");
-            }
+            var result = _dbContext.Profiles
+                .FromSqlRaw(sqlCommand, minAgeParam, maxAgeParam, gendersParam)
+                .ToList();
 
-            var sql = string.Join(" ", query);
-
-            using var command = dataSource.CreateCommand(sql);
-
-            command.Parameters.AddWithValue("@MinAge", data.MinAge);
-            command.Parameters.AddWithValue("@MaxAge", data.MaxAge);
-
-            if (data.Gender != null && data.Gender.Count > 0)
-            {
-                command.Parameters.AddWithValue("@Gender", NpgsqlDbType.Array | NpgsqlDbType.Integer, data.Gender.Select(g => (int)g).ToArray());
-            }
-
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                var profile = new ProfileData
-                {
-                    Id = reader.GetInt32(0),
-                    Username = reader.GetString(1),
-                    DateOfBirth = DateOnly.FromDateTime(reader.GetDateTime(2)),
-                    Gender = (Gender)reader.GetInt32(3),
-                    Interests = reader.GetFieldValue<List<int>>(4)
-                };
-                if (profile.Id != userId)
-                {
-                    profiles.Add(profile);
-                }
-            }
-            return profiles;
+            return result;
         }
 
-        public async Task<string?> GetUsernameFromId(int id)
+        public string? GetUsernameFromId(int id)
         {
             return _dbContext.Profiles.FirstOrDefault(p => p.Id == id)?.Username;
         }

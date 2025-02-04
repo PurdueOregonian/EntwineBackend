@@ -27,11 +27,11 @@ namespace EntwineBackend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetOwnProfileAsync()
+        public IActionResult GetOwnProfileAsync()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var profile = await _profileService.GetProfile(userId);
+            var profile = _profileService.GetProfile(userId);
 
             if (profile == null)
             {
@@ -52,9 +52,9 @@ namespace EntwineBackend.Controllers
         }
 
         [HttpGet("{userId}")]
-        public async Task<IActionResult> GetProfileAsync(int userId)
+        public IActionResult GetProfileAsync(int userId)
         {
-            var profile = await _profileService.GetProfile(userId);
+            var profile = _profileService.GetProfile(userId);
 
             if (profile == null)
             {
