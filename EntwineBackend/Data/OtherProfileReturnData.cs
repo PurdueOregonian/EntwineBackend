@@ -2,7 +2,7 @@
 
 namespace EntwineBackend.Data
 {
-    public class ProfileSearchReturnData
+    public class OtherProfileReturnData
     {
         public string? Username { get; set; }
         public int? Age { get; set; }

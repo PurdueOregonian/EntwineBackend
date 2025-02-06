@@ -55,10 +55,10 @@ namespace EntwineBackend.Services
             }
         }
 
-        public List<ProfileData> SearchUsers(int userId, string searchString)
+        public List<UserSearchResult> SearchUsers(int userId, string searchString)
         {
             var matchingUsers = _dbContext.Users.Where(user => user.UserName!.Contains(searchString) && user.Id != userId);
-            return matchingUsers.Select(user => new ProfileData { Id = user.Id, Username = user.UserName }).ToList();
+            return matchingUsers.Select(user => new UserSearchResult { Id = user.Id, Username = user.UserName }).ToList();
         }
 
         public List<ProfileData> SearchProfiles(int userId, SearchProfileParams data)

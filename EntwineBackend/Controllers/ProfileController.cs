@@ -61,7 +61,7 @@ namespace EntwineBackend.Controllers
                 return NotFound();
             }
 
-            var dataToReturn = new ProfileSearchReturnData
+            var dataToReturn = new OtherProfileReturnData
             {
                 Username = profile.Username,
                 Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),

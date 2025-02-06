@@ -22,7 +22,7 @@ namespace EntwineBackend.Controllers
             _locationService = locationService;
         }
 
-        [HttpGet]
+        [HttpGet("Users/Username")]
         public IActionResult SearchUsers([FromQuery] string searchString)
         {
             if (string.IsNullOrWhiteSpace(searchString))
@@ -37,20 +37,17 @@ namespace EntwineBackend.Controllers
             return Ok(users);
         }
 
-        [HttpPost]
+        [HttpPost("Users/Profile")]
         public IActionResult SearchProfilesAsync([FromBody] SearchProfileParams data)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             var profiles = _profileService.SearchProfiles(userId, data);
 
-            return Ok(profiles.Select(profile => new ProfileSearchReturnData
+            return Ok(profiles.Select(profile => new UserSearchResult
             {
+                Id = profile.Id,
                 Username = profile.Username,
-                Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
-                Gender = profile.Gender,
-                Interests = profile.Interests,
-                Location = profile.Location == null ? null : _locationService.GetLocationById(profile.Location.Value)
             }));
         }
     }

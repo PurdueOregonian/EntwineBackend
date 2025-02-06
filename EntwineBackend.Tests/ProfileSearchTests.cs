@@ -39,7 +39,7 @@ namespace EntwineBackend_Tests
                 response = await _client.GetAsync(requestUrl);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 responseContent = await response.Content.ReadAsStringAsync();
-                var otherProfileData = JsonSerializer.Deserialize<ProfileSearchReturnData>(responseContent, DefaultJsonOptions.Instance);
+                var otherProfileData = JsonSerializer.Deserialize<OtherProfileReturnData>(responseContent, DefaultJsonOptions.Instance);
                 Assert.Equal("SomeUsername1", otherProfileData!.Username);
                 Assert.Equal(24, otherProfileData.Age);
                 Assert.Equal(Gender.Female, otherProfileData.Gender);
@@ -52,13 +52,30 @@ namespace EntwineBackend_Tests
         }
 
         [Fact]
-        public async Task Search()
+        public async Task SearchUsers()
+        {
+            var requestUrl = "/Search/Users/Username";
+            var response = await _client.GetAsync(requestUrl + "?searchString=SomeUsername");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var searchResults = JsonSerializer.Deserialize<List<UserSearchResult>>(responseContent, DefaultJsonOptions.Instance);
+            Assert.NotNull(searchResults);
+            Assert.NotEmpty(searchResults);
+            Assert.Equal(4, searchResults!.Count);
+            Assert.Equal("SomeUsername2", searchResults[0].Username);
+            Assert.Equal("SomeUsername3", searchResults[1].Username);
+            Assert.Equal("SomeUsername4", searchResults[2].Username);
+            Assert.Equal("SomeUsername5", searchResults[3].Username);
+        }
+
+        [Fact]
+        public async Task SearchProfiles()
         {
             try
             {
                 await TestUtils.LoginAsUser(_client, "SomeUsername2");
 
-                var requestUrl = "/Search";
+                var requestUrl = "/Search/Users/Profile";
                 var content = new StringContent(JsonSerializer.Serialize(new
                 {
                     MinAge = 18,
@@ -68,7 +85,7 @@ namespace EntwineBackend_Tests
                 var response = await _client.PostAsync(requestUrl, content);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var responseContent = await response.Content.ReadAsStringAsync();
-                var searchResults = JsonSerializer.Deserialize<List<ProfileSearchReturnData>>(responseContent, DefaultJsonOptions.Instance);
+                var searchResults = JsonSerializer.Deserialize<List<OtherProfileReturnData>>(responseContent, DefaultJsonOptions.Instance);
                 Assert.NotNull(searchResults);
                 Assert.NotEmpty(searchResults);
 
@@ -81,7 +98,7 @@ namespace EntwineBackend_Tests
                 response = await _client.PostAsync(requestUrl, content);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 responseContent = await response.Content.ReadAsStringAsync();
-                searchResults = JsonSerializer.Deserialize<List<ProfileSearchReturnData>>(responseContent, DefaultJsonOptions.Instance);
+                searchResults = JsonSerializer.Deserialize<List<OtherProfileReturnData>>(responseContent, DefaultJsonOptions.Instance);
                 Assert.NotNull(searchResults);
                 Assert.Empty(searchResults);
             }

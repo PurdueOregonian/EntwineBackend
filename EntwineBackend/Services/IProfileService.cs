@@ -7,7 +7,7 @@ namespace EntwineBackend.Services
     {
         public ProfileData? GetProfile(int userId);
         public Task SaveProfile(int userId, string username, ServiceInputProfileData data);
-        public List<ProfileData> SearchUsers(int userId, string searchString);
+        public List<UserSearchResult> SearchUsers(int userId, string searchString);
         public List<ProfileData> SearchProfiles(int userId, SearchProfileParams data);
         public string? GetUsernameFromId(int id);
     }
