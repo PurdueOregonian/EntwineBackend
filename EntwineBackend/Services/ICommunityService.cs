@@ -1,9 +1,11 @@
 ﻿using EntwineBackend.Data;
+using EntwineBackend.DbItems;
 
 namespace EntwineBackend.Services
 {
     public interface ICommunityService
     {
-        CommunityData? GetCommunity(int userId);
+        CommunityData? GetCommunityData(int userId);
+        Community? GetCommunity(int userId);
     }
 }

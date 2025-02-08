@@ -52,5 +52,52 @@ namespace EntwineBackend_Tests
                 await TestUtils.LoginAsUser(_client, "SomeUsername1");
             }
         }
+
+        [Fact]
+        public async Task CommunityChat()
+        {
+            var requestUrl = "/Community/Chat/1/Messages";
+            var messageData = new MessageToSend { Content = "Hello" };
+            var json = JsonSerializer.Serialize(messageData, DefaultJsonOptions.Instance);
+            var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync(requestUrl, httpContent);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var newMessage = JsonSerializer.Deserialize<Message>(responseContent, DefaultJsonOptions.Instance);
+            Assert.Equal(1, newMessage!.SenderId);
+            Assert.Equal(1, newMessage.ChatId);
+            Assert.Contains("Hello", newMessage.Content);
+
+            response = await _client.GetAsync(requestUrl);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            responseContent = await response.Content.ReadAsStringAsync();
+            var messages = JsonSerializer.Deserialize<List<Message>>(responseContent, DefaultJsonOptions.Instance);
+            Assert.Equal(1, messages![^1].SenderId);
+            Assert.Equal(1, messages[^1].ChatId);
+            Assert.Contains("Hello", messages[^1].Content);
+        }
+
+        [Fact]
+        public async Task CommunityChatFromUserNotInCommunity()
+        {
+            try
+            {
+                await TestUtils.LoginAsUser(_client, "SomeUsername4");
+
+                var requestUrl = "/Community/Chat/1/Messages";
+                var messageData = new MessageToSend { Content = "Hello" };
+                var json = JsonSerializer.Serialize(messageData, DefaultJsonOptions.Instance);
+                var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _client.PostAsync(requestUrl, httpContent);
+                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+
+                response = await _client.GetAsync(requestUrl);
+                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+            }
+            finally
+            {
+                await TestUtils.LoginAsUser(_client, "SomeUsername1");
+            }
+        }
     }
 }

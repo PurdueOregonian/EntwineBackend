@@ -18,8 +18,6 @@ namespace EntwineBackend.Controllers
             _locationService = locationService;
         }
 
-        
-
         [HttpGet]
         public async Task<IActionResult> GetLocationAsync(
             [FromQuery] string latitude,

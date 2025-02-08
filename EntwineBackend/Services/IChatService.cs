@@ -8,6 +8,6 @@ namespace EntwineBackend.Services
         public List<Message> GetMessages(int chatId);
         public Chat? GetChat(int chatId);
         public Task<Chat?> CreateChat(List<int> userIds);
-        public Task<Message?> SendMessage(int chatId, int senderId, string content);
+        public Task<Message> SendMessage(int chatId, int senderId, string content);
     }
 }

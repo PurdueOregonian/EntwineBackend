@@ -1,7 +1,5 @@
 ﻿using EntwineBackend.DbContext;
 using EntwineBackend.DbItems;
-using Npgsql;
-using System.Text;
 using System.Text.Json.Nodes;
 
 namespace EntwineBackend.Services

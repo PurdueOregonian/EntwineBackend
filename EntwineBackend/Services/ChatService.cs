@@ -58,7 +58,7 @@ namespace EntwineBackend.Services
             return newChat;
         }
 
-        public async Task<Message?> SendMessage(int chatId, int senderId, string content)
+        public async Task<Message> SendMessage(int chatId, int senderId, string content)
         {
             var newMessage = new Message
             {

@@ -1,5 +1,6 @@
 ﻿using EntwineBackend.Data;
 using EntwineBackend.DbContext;
+using EntwineBackend.DbItems;
 
 namespace EntwineBackend.Services
 {
@@ -13,7 +14,7 @@ namespace EntwineBackend.Services
             _dbContext = entwineDbContext;
         }
 
-        public CommunityData? GetCommunity(int userId)
+        public CommunityData? GetCommunityData(int userId)
         {
             var profile = _dbContext.Profiles.FirstOrDefault(p => p.Id == userId);
             if (profile == null || profile.Location == null)
@@ -47,6 +48,23 @@ namespace EntwineBackend.Services
                 UserIds = community.UserIds,
                 Chats = communityChats
             };
+        }
+
+        public Community? GetCommunity(int userId)
+        {
+            var profile = _dbContext.Profiles.FirstOrDefault(p => p.Id == userId);
+            if (profile == null || profile.Location == null)
+            {
+                return null;
+            }
+            var userLocationId = profile.Location;
+            var location = _dbContext.Locations.FirstOrDefault(l => l.Id == userLocationId);
+            var community = _dbContext.Communities.FirstOrDefault(c => c.Location == userLocationId);
+            if (location == null || community == null)
+            {
+                return null;
+            }
+            return community;
         }
     }
 }
