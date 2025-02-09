@@ -31,6 +31,7 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<ICommunityChatService, CommunityChatService>();
 builder.Services.AddScoped<IAuthorizationHandler, UserInChatRequirementHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, UserInChatCommunityRequirementHandler>();
 builder.Services.AddSingleton<TokenBlacklist>();
 builder.Services.AddHttpClient();
 builder.Services.AddSignalR();
@@ -76,7 +77,7 @@ builder.Services.AddAuthentication(options =>
 
                 var path = context.HttpContext.Request.Path;
                 if (!string.IsNullOrEmpty(accessToken) &&
-                    path.StartsWithSegments("/chatHub"))
+                    (path.StartsWithSegments("/chatHub") || path.StartsWithSegments("/communityChatHub")))
                 {
                     context.Token = accessToken;
                 }
@@ -94,6 +95,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("UserInChat", policy =>
     {
         policy.Requirements.Add(new UserInChatRequirement());
+    });
+    options.AddPolicy("UserInChatCommunity", policy =>
+    {
+        policy.Requirements.Add(new UserInChatCommunityRequirement());
     });
 });
 
@@ -116,6 +121,7 @@ app.UseMiddleware<TokenBlacklistMiddleware>();
 
 app.MapControllers();
 app.MapHub<ChatHub>("/chatHub");
+app.MapHub<CommunityChatHub>("/communityChatHub");
 
 app.Run();
 

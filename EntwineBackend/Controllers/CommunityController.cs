@@ -1,7 +1,10 @@
 using EntwineBackend.Data;
+using EntwineBackend.DbContext;
+using EntwineBackend.PubSub;
 using EntwineBackend.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace EntwineBackend.Controllers
@@ -13,23 +16,31 @@ namespace EntwineBackend.Controllers
     {
         private readonly ICommunityService _communityService;
         private readonly ICommunityChatService _communityChatService;
-        private readonly IProfileService _profileService;
+        private readonly EntwineDbContext _dbContext;
+        private readonly IHubContext<CommunityChatHub> _communityChatHubContext;
 
         public CommunityController(
             ICommunityService communityService,
             ICommunityChatService communityChatService,
-            IProfileService profileService)
+            EntwineDbContext dbContext,
+            IHubContext<CommunityChatHub> communityChatHubContext)
         {
             _communityService = communityService;
             _communityChatService = communityChatService;
-            _profileService = profileService;
+            _dbContext = dbContext;
+            _communityChatHubContext = communityChatHubContext;
         }
 
         [HttpGet]
         public IActionResult GetCommunityAsync()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            return Ok(_communityService.GetCommunityData(userId));
+            var communityData = _communityService.GetCommunityData(userId);
+            if (communityData == null)
+            {
+                return NotFound();
+            }
+            return Ok(communityData);
         }
 
         [HttpGet("Chat/{chatId}/Messages")]
@@ -37,11 +48,7 @@ namespace EntwineBackend.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            //TODO change when user has community list
-            var userLocation = _profileService.GetProfile(userId)?.Location;
-            var community = _communityChatService.GetChatCommunity(chatId);
-
-            if (userLocation != community)
+            if (!Utils.IsUserInChatCommunity(_dbContext, userId, chatId))
             {
                 return Unauthorized();
             }
@@ -60,17 +67,15 @@ namespace EntwineBackend.Controllers
 
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            //TODO change when user has community list
-            var userLocation = _profileService.GetProfile(userId)?.Location;
-            var community = _communityChatService.GetChatCommunity(chatId);
-
-            if (userLocation != community)
+            if(!Utils.IsUserInChatCommunity(_dbContext, userId, chatId))
             {
                 return Unauthorized();
             }
 
-            var result = await _communityChatService.SendMessage(userId, chatId, data.Content);
-            return Ok(result);
+            var message = await _communityChatService.SendMessage(userId, chatId, data.Content);
+            await _communityChatHubContext.Clients.Group($"Community-{chatId.ToString()}")
+                .SendAsync("ReceiveMessage", message);
+            return Ok(message);
         }
     }
 }
