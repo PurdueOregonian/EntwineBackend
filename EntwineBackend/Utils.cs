@@ -1,6 +1,4 @@
 ﻿using EntwineBackend.DbContext;
-using EntwineBackend.DbItems;
-using Microsoft.EntityFrameworkCore;
 
 namespace EntwineBackend
 {
@@ -18,12 +16,13 @@ namespace EntwineBackend
         {
             //TODO change when user has community list
             var userLocation = dbContext.Profiles.FirstOrDefault(p => p.Id == userId)?.Location;
+            var userCommunity = dbContext.Communities.FirstOrDefault(c => c.Location == userLocation);
             var community = dbContext.CommunityChats
                 .Where(chat => chat.Id == chatId)
                 .Select(chat => chat.Community)
                 .FirstOrDefault();
 
-            return userLocation == community;
+            return userCommunity?.Id == community;
         }
     }
 }
