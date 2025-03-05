@@ -1,4 +1,5 @@
 ﻿using EntwineBackend.DbContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace EntwineBackend
 {
@@ -15,8 +16,13 @@ namespace EntwineBackend
         public static bool IsUserInChatCommunity(EntwineDbContext dbContext, int userId, int chatId)
         {
             //TODO change when user has community list
-            var userLocation = dbContext.Profiles.FirstOrDefault(p => p.Id == userId)?.Location;
-            var userCommunity = dbContext.Communities.FirstOrDefault(c => c.Location == userLocation);
+            //TODO probably not efficient to include location all the time
+            var userLocation = dbContext.Profiles.Include(p => p.Location).FirstOrDefault(p => p.Id == userId)?.Location;
+            if(userLocation is null)
+            {
+                return false;
+            }
+            var userCommunity = dbContext.Communities.FirstOrDefault(c => c.Location == userLocation.Id);
             var community = dbContext.CommunityChats
                 .Where(chat => chat.Id == chatId)
                 .Select(chat => chat.Community)

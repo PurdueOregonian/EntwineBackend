@@ -45,7 +45,7 @@ namespace EntwineBackend.Controllers
                 DateOfBirth = profile.DateOfBirth,
                 Gender = profile.Gender,
                 Interests = profile.Interests,
-                Location = profile.Location == null ? null : _locationService.GetLocationById(profile.Location.Value)
+                Location = profile.Location == null ? null : _locationService.GetLocationById(profile.Location.Id)
             };
 
             return Ok(ownProfileReturnData);
@@ -67,7 +67,7 @@ namespace EntwineBackend.Controllers
                 Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
                 Gender = profile.Gender,
                 Interests = profile.Interests,
-                Location = profile.Location == null ? null : _locationService.GetLocationById(profile.Location.Value)
+                Location = profile.Location == null ? null : _locationService.GetLocationById(profile.Location.Id)
             };
             return Ok(dataToReturn);
         }
@@ -76,18 +76,13 @@ namespace EntwineBackend.Controllers
         public async Task<IActionResult> SaveProfileAsync([FromBody] InputProfileData data)
         {
             var location = data.Location;
-            int? locationId = null;
-            if (location != null)
-            {
-                locationId = await _locationService.GetLocationId(location);
-            }
 
             var serviceInputProfileData = new ServiceInputProfileData
             {
                 DateOfBirth = data.DateOfBirth,
                 Gender = data.Gender,
                 Interests = data.Interests,
-                Location = locationId
+                Location = location is null ? null : await _locationService.GetLocationWithId(location)
             };
 
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

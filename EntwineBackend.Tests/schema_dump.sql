@@ -33,6 +33,26 @@ ALTER SCHEMA public OWNER TO postgres;
 COMMENT ON SCHEMA public IS '';
 
 
+--
+-- Name: search_profiles(integer, integer, integer[]); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.search_profiles(min_age integer, max_age integer, genders integer[]) RETURNS TABLE(id integer, username text, date_of_birth date, gender integer, interests integer[], location integer)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+	RETURN QUERY
+	SELECT "Id", "Username", "DateOfBirth", "Gender", "Interests", "Location"
+	FROM public."Profiles"
+	WHERE DATE_PART('year', AGE("Profiles"."DateOfBirth")) >= min_age
+	AND DATE_PART('year', AGE("Profiles"."DateOfBirth")) <= max_age
+	AND "Profiles"."Gender" = ANY(genders);
+END;
+$$;
+
+
+ALTER FUNCTION public.search_profiles(min_age integer, max_age integer, genders integer[]) OWNER TO postgres;
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -430,7 +450,7 @@ CREATE TABLE public."Profiles" (
     "DateOfBirth" date,
     "Gender" integer,
     "Interests" integer[],
-    "Location" integer
+    "LocationId" integer
 );
 
 
@@ -697,6 +717,13 @@ CREATE UNIQUE INDEX "IX_Profiles_Id" ON public."Profiles" USING btree ("Id");
 
 
 --
+-- Name: IX_Profiles_LocationId; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "IX_Profiles_LocationId" ON public."Profiles" USING btree ("LocationId");
+
+
+--
 -- Name: RoleNameIndex; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -756,6 +783,14 @@ ALTER TABLE ONLY public."AspNetUserRoles"
 
 ALTER TABLE ONLY public."AspNetUserTokens"
     ADD CONSTRAINT "FK_AspNetUserTokens_AspNetUsers_UserId" FOREIGN KEY ("UserId") REFERENCES public."AspNetUsers"("Id") ON DELETE CASCADE;
+
+
+--
+-- Name: Profiles FK_Profiles_Locations_LocationId; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Profiles"
+    ADD CONSTRAINT "FK_Profiles_Locations_LocationId" FOREIGN KEY ("LocationId") REFERENCES public."Locations"("Id");
 
 
 --

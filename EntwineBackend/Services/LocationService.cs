@@ -78,13 +78,13 @@ namespace EntwineBackend.Services
             return null;
         }
 
-        public async Task<int> GetLocationId(InputLocation location)
+        public async Task<Location> GetLocationWithId(InputLocation location)
         {
             var matchingLocation = _dbContext.Locations.FirstOrDefault(
                 l => l.City == location.City && l.Country == location.Country && l.State == location.State);
             if (matchingLocation != null)
             {
-                return matchingLocation.Id;
+                return matchingLocation;
             }
             else
             {
@@ -102,7 +102,7 @@ namespace EntwineBackend.Services
                 // The newLocation.Id will be populated with the generated ID
                 await CreateNewCommunity(newLocation.Id);
 
-                return newLocation.Id;
+                return newLocation;
             }
         }
 

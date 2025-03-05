@@ -1,6 +1,7 @@
 ﻿using EntwineBackend.Data;
 using EntwineBackend.DbContext;
 using EntwineBackend.DbItems;
+using Microsoft.EntityFrameworkCore;
 
 namespace EntwineBackend.Services
 {
@@ -16,13 +17,13 @@ namespace EntwineBackend.Services
 
         public CommunityData? GetCommunityData(int userId)
         {
-            var profile = _dbContext.Profiles.FirstOrDefault(p => p.Id == userId);
+            var profile = _dbContext.Profiles.Include(p => p.Location).FirstOrDefault(p => p.Id == userId);
             if (profile == null || profile.Location == null)
             {
                 return null;
             }
-            var userLocationId = profile.Location;
-            var location = _dbContext.Locations.FirstOrDefault(l => l.Id == userLocationId);
+            var userLocationId = profile.Location.Id;
+            var location = profile.Location;
 
             var community = _dbContext.Communities.FirstOrDefault(c => c.Location == userLocationId);
 
@@ -52,13 +53,13 @@ namespace EntwineBackend.Services
 
         public Community? GetCommunity(int userId)
         {
-            var profile = _dbContext.Profiles.FirstOrDefault(p => p.Id == userId);
+            var profile = _dbContext.Profiles.Include(p => p.Location).FirstOrDefault(p => p.Id == userId);
             if (profile == null || profile.Location == null)
             {
                 return null;
             }
-            var userLocationId = profile.Location;
-            var location = _dbContext.Locations.FirstOrDefault(l => l.Id == userLocationId);
+            var userLocationId = profile.Location.Id;
+            var location = profile.Location;
             var community = _dbContext.Communities.FirstOrDefault(c => c.Location == userLocationId);
             if (location == null || community == null)
             {

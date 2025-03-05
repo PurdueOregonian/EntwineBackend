@@ -18,7 +18,7 @@ namespace EntwineBackend.Services
 
         public ProfileData? GetProfile(int userId)
         {
-            return _dbContext.Profiles.FirstOrDefault(p => p.Id == userId);
+            return _dbContext.Profiles.Include(p => p.Location).FirstOrDefault(p => p.Id == userId);
         }
 
         public async Task SaveProfile(int userId, string username, ServiceInputProfileData data)
@@ -49,9 +49,9 @@ namespace EntwineBackend.Services
             }
             await _dbContext.SaveChangesAsync();
 
-            if (data.Location is not null && data.Location != currentLocation)
+            if (data.Location is not null && data.Location.Id != currentLocation?.Id)
             {
-                await AddUserToCommunity(userId, data.Location.Value);
+                await AddUserToCommunity(userId, data.Location.Id);
             }
         }
 
