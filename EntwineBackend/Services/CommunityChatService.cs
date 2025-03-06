@@ -1,5 +1,6 @@
 ﻿using EntwineBackend.DbContext;
 using EntwineBackend.DbItems;
+using Microsoft.EntityFrameworkCore;
 
 namespace EntwineBackend.Services
 {
@@ -12,24 +13,38 @@ namespace EntwineBackend.Services
             _dbContext = dbContext;
         }
 
-        public List<CommunityChatMessage> GetMessages(int chatId)
+        public List<CommunityChatMessageReturnData> GetMessages(int chatId)
         {
-            return _dbContext.CommunityChatMessages.Where(message => message.ChatId == chatId)
+            return _dbContext.CommunityChatMessages
+                .Include(m => m.Sender)
+                .Where(message => message.ChatId == chatId)
+                .Select(message => new CommunityChatMessageReturnData
+                {
+                    Username = message.Sender.Username,
+                    Content = message.Content,
+                    TimeSent = message.TimeSent
+                })
                 .ToList();
         }
 
-        public async Task<CommunityChatMessage> SendMessage(int chatId, int senderId, string content)
+        public async Task<CommunityChatMessageReturnData> SendMessage(int chatId, int senderId, string content)
         {
+            var user = _dbContext.Profiles.Find(senderId);
             var newMessage = new CommunityChatMessage
             {
                 ChatId = chatId,
-                SenderId = senderId,
+                Sender = user,
                 Content = content,
                 TimeSent = DateTime.UtcNow
             };
             await _dbContext.CommunityChatMessages.AddAsync(newMessage);
             await _dbContext.SaveChangesAsync();
-            return newMessage;
+            return new CommunityChatMessageReturnData
+            {
+                Username = user.Username,
+                Content = content,
+                TimeSent = newMessage.TimeSent
+            };
         }
 
         public int? GetChatCommunity(int chatId)

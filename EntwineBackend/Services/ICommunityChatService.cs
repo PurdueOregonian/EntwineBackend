@@ -4,8 +4,8 @@ namespace EntwineBackend.Services
 {
     public interface ICommunityChatService
     {
-        List<CommunityChatMessage> GetMessages(int chatId);
-        Task<CommunityChatMessage> SendMessage(int chatId, int senderId, string content);
+        List<CommunityChatMessageReturnData> GetMessages(int chatId);
+        Task<CommunityChatMessageReturnData> SendMessage(int chatId, int senderId, string content);
         int? GetChatCommunity(int chatId);
     }
 }

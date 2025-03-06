@@ -72,7 +72,7 @@ namespace EntwineBackend.Controllers
                 return Unauthorized();
             }
 
-            var message = await _communityChatService.SendMessage(userId, chatId, data.Content);
+            var message = await _communityChatService.SendMessage(chatId, userId, data.Content);
             await _communityChatHubContext.Clients.Group($"Community-{chatId.ToString()}")
                 .SendAsync("ReceiveMessage", message);
             return Ok(message);
