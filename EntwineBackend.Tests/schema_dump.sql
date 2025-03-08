@@ -675,6 +675,13 @@ CREATE INDEX "IX_CommunityChatMessages_ChatId" ON public."CommunityChatMessages"
 
 
 --
+-- Name: IX_CommunityChatMessages_SenderId; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "IX_CommunityChatMessages_SenderId" ON public."CommunityChatMessages" USING btree ("SenderId");
+
+
+--
 -- Name: IX_CommunityChats_Id; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -707,6 +714,13 @@ CREATE UNIQUE INDEX "IX_Locations_Id" ON public."Locations" USING btree ("Id");
 --
 
 CREATE INDEX "IX_Messages_ChatId" ON public."Messages" USING btree ("ChatId");
+
+
+--
+-- Name: IX_Messages_SenderId; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX "IX_Messages_SenderId" ON public."Messages" USING btree ("SenderId");
 
 
 --
@@ -783,6 +797,22 @@ ALTER TABLE ONLY public."AspNetUserRoles"
 
 ALTER TABLE ONLY public."AspNetUserTokens"
     ADD CONSTRAINT "FK_AspNetUserTokens_AspNetUsers_UserId" FOREIGN KEY ("UserId") REFERENCES public."AspNetUsers"("Id") ON DELETE CASCADE;
+
+
+--
+-- Name: CommunityChatMessages FK_CommunityChatMessages_Profiles_SenderId; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."CommunityChatMessages"
+    ADD CONSTRAINT "FK_CommunityChatMessages_Profiles_SenderId" FOREIGN KEY ("SenderId") REFERENCES public."Profiles"("Id") ON DELETE CASCADE;
+
+
+--
+-- Name: Messages FK_Messages_Profiles_SenderId; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public."Messages"
+    ADD CONSTRAINT "FK_Messages_Profiles_SenderId" FOREIGN KEY ("SenderId") REFERENCES public."Profiles"("Id") ON DELETE CASCADE;
 
 
 --
