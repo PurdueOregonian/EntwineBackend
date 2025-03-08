@@ -63,14 +63,14 @@ namespace EntwineBackend_Tests
             var response = await _client.PostAsync(requestUrl, httpContent);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseContent = await response.Content.ReadAsStringAsync();
-            var newMessage = JsonSerializer.Deserialize<CommunityChatMessageReturnData>(responseContent, DefaultJsonOptions.Instance);
+            var newMessage = JsonSerializer.Deserialize<MessageReturnData>(responseContent, DefaultJsonOptions.Instance);
             Assert.Equal("SomeUsername1", newMessage!.Username);
             Assert.Contains("Hello", newMessage.Content);
 
             response = await _client.GetAsync(requestUrl);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             responseContent = await response.Content.ReadAsStringAsync();
-            var messages = JsonSerializer.Deserialize<List<CommunityChatMessageReturnData>>(responseContent, DefaultJsonOptions.Instance);
+            var messages = JsonSerializer.Deserialize<List<MessageReturnData>>(responseContent, DefaultJsonOptions.Instance);
             Assert.Equal("SomeUsername1", messages![^1].Username);
             Assert.Contains("Hello", messages[^1].Content);
         }

@@ -1,6 +1,6 @@
 ﻿namespace EntwineBackend.DbItems
 {
-    public class CommunityChatMessageReturnData
+    public class MessageReturnData
     {
         public string? Username { get; set; }
         public string? Content { get; set; }

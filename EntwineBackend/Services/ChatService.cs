@@ -1,5 +1,6 @@
 ﻿using EntwineBackend.DbContext;
 using EntwineBackend.DbItems;
+using Microsoft.EntityFrameworkCore;
 
 namespace EntwineBackend.Services
 {
@@ -21,9 +22,17 @@ namespace EntwineBackend.Services
             return chats;
         }
 
-        public List<Message> GetMessages(int chatId)
+        public List<MessageReturnData> GetMessages(int chatId)
         {
-            return _dbContext.Messages.Where(message => message.ChatId == chatId)
+            return _dbContext.Messages
+                .Include(m => m.Sender)
+                .Where(message => message.ChatId == chatId)
+                .Select(message => new MessageReturnData
+                {
+                    Username = message.Sender.Username,
+                    Content = message.Content,
+                    TimeSent = message.TimeSent
+                })
                 .ToList();
         }
 
@@ -58,18 +67,24 @@ namespace EntwineBackend.Services
             return newChat;
         }
 
-        public async Task<Message> SendMessage(int chatId, int senderId, string content)
+        public async Task<MessageReturnData> SendMessage(int chatId, int senderId, string content)
         {
+            var sender = _dbContext.Profiles.Find(senderId);
             var newMessage = new Message
             {
                 ChatId = chatId,
-                SenderId = senderId,
+                Sender = sender,
                 Content = content,
                 TimeSent = DateTime.UtcNow
             };
             await _dbContext.Messages.AddAsync(newMessage);
             await _dbContext.SaveChangesAsync();
-            return newMessage;
+            return new MessageReturnData
+            {
+                Username = sender.Username,
+                Content = content,
+                TimeSent = newMessage.TimeSent
+            };
         }
     }
 }

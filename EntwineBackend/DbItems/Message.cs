@@ -11,7 +11,7 @@ namespace EntwineBackend.DbItems
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public int ChatId { get; set; }
-        public int SenderId { get; set; }
+        public required ProfileData Sender { get; set; }
         public string? Content { get; set; }
         public DateTime? TimeSent { get; set; }
     }

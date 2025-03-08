@@ -13,12 +13,12 @@ namespace EntwineBackend.Services
             _dbContext = dbContext;
         }
 
-        public List<CommunityChatMessageReturnData> GetMessages(int chatId)
+        public List<MessageReturnData> GetMessages(int chatId)
         {
             return _dbContext.CommunityChatMessages
                 .Include(m => m.Sender)
                 .Where(message => message.ChatId == chatId)
-                .Select(message => new CommunityChatMessageReturnData
+                .Select(message => new MessageReturnData
                 {
                     Username = message.Sender.Username,
                     Content = message.Content,
@@ -27,7 +27,7 @@ namespace EntwineBackend.Services
                 .ToList();
         }
 
-        public async Task<CommunityChatMessageReturnData> SendMessage(int chatId, int senderId, string content)
+        public async Task<MessageReturnData> SendMessage(int chatId, int senderId, string content)
         {
             var user = _dbContext.Profiles.Find(senderId);
             var newMessage = new CommunityChatMessage
@@ -39,7 +39,7 @@ namespace EntwineBackend.Services
             };
             await _dbContext.CommunityChatMessages.AddAsync(newMessage);
             await _dbContext.SaveChangesAsync();
-            return new CommunityChatMessageReturnData
+            return new MessageReturnData
             {
                 Username = user.Username,
                 Content = content,

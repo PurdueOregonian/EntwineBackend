@@ -21,7 +21,7 @@ namespace EntwineBackend_Tests
             _server = factory.Server;
         }
 
-        [Fact]
+        [Fact(Timeout = 5000)]
         public async Task ReceiveMessageFromHub()
         {
             var message = "";
@@ -40,7 +40,7 @@ namespace EntwineBackend_Tests
             Assert.Equal(HubConnectionState.Connected, connection.State);
 
             var tcs = new TaskCompletionSource<bool>();
-            connection.On<Message>("ReceiveMessage", messageReceived =>
+            connection.On<MessageReturnData>("ReceiveMessage", messageReceived =>
             {
                 message = messageReceived.Content;
                 tcs.SetResult(true);

@@ -38,19 +38,17 @@ namespace EntwineBackend_Tests
                 response = await _client.PostAsync(requestUrl, httpContent);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 responseContent = await response.Content.ReadAsStringAsync();
-                var newMessage = JsonSerializer.Deserialize<Message>(responseContent, DefaultJsonOptions.Instance);
-                Assert.Equal(1, newMessage!.SenderId);
-                Assert.Equal(1, newMessage.ChatId);
+                var newMessage = JsonSerializer.Deserialize<MessageReturnData>(responseContent, DefaultJsonOptions.Instance);
+                Assert.Equal("SomeUsername1", newMessage!.Username);
                 Assert.Contains("Hello", newMessage.Content);
 
                 await TestUtils.LoginAsUser(_client, "SomeUsername2");
                 response = await _client.GetAsync(requestUrl);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 responseContent = await response.Content.ReadAsStringAsync();
-                var messages = JsonSerializer.Deserialize<List<Message>>(responseContent, DefaultJsonOptions.Instance);
+                var messages = JsonSerializer.Deserialize<List<MessageReturnData>>(responseContent, DefaultJsonOptions.Instance);
                 // ChatHubTests could have sent a message also. Just check the last message
-                Assert.Equal(1, messages![^1].SenderId);
-                Assert.Equal(1, messages[^1].ChatId);
+                Assert.Equal("SomeUsername1", messages![^1].Username);
                 Assert.Contains("Hello", messages[^1].Content);
             }
             finally
