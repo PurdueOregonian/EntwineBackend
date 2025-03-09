@@ -24,12 +24,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IProfileService, ProfileService>();
-builder.Services.AddScoped<IChatService, ChatService>();
-builder.Services.AddScoped<IInterestService, InterestService>();
 builder.Services.AddScoped<ILocationService, LocationService>();
-builder.Services.AddScoped<ICommunityService, CommunityService>();
-builder.Services.AddScoped<ICommunityChatService, CommunityChatService>();
 builder.Services.AddScoped<IAuthorizationHandler, UserInChatRequirementHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, UserInChatCommunityRequirementHandler>();
 builder.Services.AddSingleton<TokenBlacklist>();

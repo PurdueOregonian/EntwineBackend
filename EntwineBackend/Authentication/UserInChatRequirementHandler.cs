@@ -1,4 +1,5 @@
-﻿using EntwineBackend.Services;
+﻿using EntwineBackend.DbContext;
+using Friends5___Backend;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 namespace EntwineBackend.Authentication
@@ -6,12 +7,12 @@ namespace EntwineBackend.Authentication
     public class UserInChatRequirementHandler : AuthorizationHandler<UserInChatRequirement>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IChatService _chatService;
+        private readonly EntwineDbContext _dbContext;
 
-        public UserInChatRequirementHandler(IHttpContextAccessor httpContextAccessor, IChatService chatService)
+        public UserInChatRequirementHandler(IHttpContextAccessor httpContextAccessor, EntwineDbContext dbContext)
         {
             _httpContextAccessor = httpContextAccessor;
-            _chatService = chatService;
+            _dbContext = dbContext;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, UserInChatRequirement requirement)
@@ -36,7 +37,7 @@ namespace EntwineBackend.Authentication
                 return;
             }
 
-            var chat = _chatService.GetChat(chatId);
+            var chat = DbFunctions.GetChat(_dbContext, chatId);
 
             if (chat is null || chat.UserIds is null)
             {

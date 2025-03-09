@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
+using EntwineBackend.DbContext;
+using Friends5___Backend;
 
 namespace EntwineBackend.Controllers
 {
@@ -13,16 +15,16 @@ namespace EntwineBackend.Controllers
     [Authorize(Policy = "UserId")]
     public class ChatController : ControllerBase
     {
-        private readonly IChatService _chatService;
+        private readonly EntwineDbContext _dbContext;
         private readonly IAuthService _authService;
         private readonly IHubContext<ChatHub> _chatHubContext;
 
         public ChatController(
-            IChatService chatService,
+            EntwineDbContext dbContext,
             IAuthService authService,
             IHubContext<ChatHub> chatHubContext)
         {
-            _chatService = chatService;
+            _dbContext = dbContext;
             _authService = authService;
             _chatHubContext = chatHubContext;
         }
@@ -38,7 +40,7 @@ namespace EntwineBackend.Controllers
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var userIds = data.UserIds;
             userIds.Add(userId);
-            var chat = await _chatService.CreateChat(userIds);
+            var chat = await DbFunctions.CreateChat(_dbContext, userIds);
             if (chat == null)
             {
                 return StatusCode(500);
@@ -51,7 +53,7 @@ namespace EntwineBackend.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var chats = _chatService.GetChats(userId);
+            var chats = DbFunctions.GetChats(_dbContext, userId);
 
             var chatDatas = new List<ChatData>();
             foreach (var chat in chats)
@@ -81,7 +83,7 @@ namespace EntwineBackend.Controllers
         [HttpGet("{chatId}/Messages")]
         public IActionResult GetMessages([FromRoute] int chatId)
         {
-            var chat = _chatService.GetChat(chatId);
+            var chat = DbFunctions.GetChat(_dbContext, chatId);
 
             if(chat is null)
             {
@@ -100,7 +102,7 @@ namespace EntwineBackend.Controllers
                 return NotFound();
             }
 
-            var messages = _chatService.GetMessages(chatId);
+            var messages = DbFunctions.GetMessages(_dbContext, chatId);
 
             return Ok(messages);
         }
@@ -113,7 +115,7 @@ namespace EntwineBackend.Controllers
                 return BadRequest();
             }
 
-            var chat = _chatService.GetChat(chatId);
+            var chat = DbFunctions.GetChat(_dbContext, chatId);
             if (chat is null)
             {
                 return NotFound();
@@ -128,7 +130,7 @@ namespace EntwineBackend.Controllers
                 return NotFound();
             }
 
-            var message = await _chatService.SendMessage(chatId, userId, data.Content);
+            var message = await DbFunctions.SendMessage(_dbContext, chatId, userId, data.Content);
             await _chatHubContext.Clients.Group(chatId.ToString()).SendAsync("ReceiveMessage", message);
 
             return Ok(message);

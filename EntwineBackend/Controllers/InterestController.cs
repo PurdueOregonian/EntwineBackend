@@ -1,4 +1,6 @@
+using EntwineBackend.DbContext;
 using EntwineBackend.Services;
+using Friends5___Backend;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,18 +11,18 @@ namespace EntwineBackend.Controllers
     [Authorize(Policy = "UserId")]
     public class InterestController : ControllerBase
     {
-        private readonly IInterestService _interestService;
+        private readonly EntwineDbContext _dbContext;
 
         public InterestController(
-            IInterestService interestService)
+            EntwineDbContext dbContext)
         {
-            _interestService = interestService;
+            _dbContext = dbContext;
         }
 
         [HttpGet("Category")]
         public IActionResult GetInterestCategories()
         {
-            var categories = _interestService.GetInterestCategories();
+            var categories = DbFunctions.GetInterestCategories(_dbContext);
 
             return Ok(categories);
         }
@@ -28,7 +30,7 @@ namespace EntwineBackend.Controllers
         [HttpGet]
         public IActionResult GetInterests()
         {
-            var interests = _interestService.GetInterests();
+            var interests = DbFunctions.GetInterests(_dbContext);
 
             return Ok(interests);
         }

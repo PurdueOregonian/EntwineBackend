@@ -3,6 +3,8 @@ using EntwineBackend.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using EntwineBackend.DbContext;
+using Friends5___Backend;
 
 namespace EntwineBackend.Controllers
 {
@@ -11,15 +13,12 @@ namespace EntwineBackend.Controllers
     [Authorize(Policy = "UserId")]
     public class SearchController : ControllerBase
     {
-        private readonly IProfileService _profileService;
-        private readonly ILocationService _locationService;
+        private readonly EntwineDbContext _dbContext;
 
         public SearchController(
-            IProfileService profileService,
-            ILocationService locationService)
+            EntwineDbContext dbContext)
         {
-            _profileService = profileService;
-            _locationService = locationService;
+            _dbContext = dbContext;
         }
 
         [HttpGet("Users/Username")]
@@ -32,7 +31,7 @@ namespace EntwineBackend.Controllers
 
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var users = _profileService.SearchUsers(userId, searchString);
+            var users = DbFunctions.SearchUsers(_dbContext, userId, searchString);
 
             return Ok(users);
         }
@@ -42,7 +41,7 @@ namespace EntwineBackend.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var profiles = _profileService.SearchProfiles(userId, data);
+            var profiles = DbFunctions.SearchProfiles(_dbContext, userId, data);
 
             return Ok(profiles.Select(profile => new UserSearchResult
             {

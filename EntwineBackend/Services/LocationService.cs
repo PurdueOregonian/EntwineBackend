@@ -8,13 +8,11 @@ namespace EntwineBackend.Services
     {
         IHttpClientFactory _httpClientFactory;
         private readonly string _apiKey;
-        private readonly EntwineDbContext _dbContext;
 
-        public LocationService(IHttpClientFactory httpClientFactory, EntwineDbContext dbContext)
+        public LocationService(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
             _apiKey = ReadApiKeyFromFile("./ApiKey.txt");
-            _dbContext = dbContext;
         }
 
         private string ReadApiKeyFromFile(string filePath)
@@ -76,61 +74,6 @@ namespace EntwineBackend.Services
             }
 
             return null;
-        }
-
-        public async Task<Location> GetLocationWithId(InputLocation location)
-        {
-            var matchingLocation = _dbContext.Locations.FirstOrDefault(
-                l => l.City == location.City && l.Country == location.Country && l.State == location.State);
-            if (matchingLocation != null)
-            {
-                return matchingLocation;
-            }
-            else
-            {
-                // Create new location and return Id
-                // We also need to add a Community
-                var newLocation = new Location
-                {
-                    City = location.City,
-                    Country = location.Country,
-                    State = location.State
-                };
-                _dbContext.Locations.Add(newLocation);
-                await _dbContext.SaveChangesAsync();
-
-                // The newLocation.Id will be populated with the generated ID
-                await CreateNewCommunity(newLocation.Id);
-
-                return newLocation;
-            }
-        }
-
-        public Location? GetLocationById(int locationId)
-        {
-            return _dbContext.Locations.FirstOrDefault(l => l.Id == locationId);
-        }
-
-        private async Task CreateNewCommunity(int locationId)
-        {
-            var community = new Community
-            {
-                Location = locationId,
-                UserIds = []
-            };
-            _dbContext.Communities.Add(community);
-            await _dbContext.SaveChangesAsync();
-
-            // Now we need to create the default chats for the community. For each interest category, create a chat
-            var defaultChats = Constants.InterestCategories.Select(category =>
-                new CommunityChat
-                {
-                    Name = category.Name,
-                    Community = community.Id
-                }
-            ).ToList();
-            _dbContext.CommunityChats.AddRange(defaultChats);
-            await _dbContext.SaveChangesAsync();
         }
     }
 }

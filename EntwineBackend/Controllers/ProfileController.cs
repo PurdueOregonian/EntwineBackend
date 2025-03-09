@@ -1,9 +1,10 @@
 using EntwineBackend.DbItems;
-using EntwineBackend.Services;
 using EntwineBackend.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using EntwineBackend.DbContext;
+using Friends5___Backend;
 
 namespace EntwineBackend.Controllers
 {
@@ -13,17 +14,14 @@ namespace EntwineBackend.Controllers
     public class ProfileController : ControllerBase
     {
         private readonly ILogger<ProfileController> _logger;
-        private readonly IProfileService _profileService;
-        private readonly ILocationService _locationService;
+        private readonly EntwineDbContext _dbContext;
 
         public ProfileController(
             ILogger<ProfileController> logger,
-            IProfileService profileService,
-            ILocationService locationService)
+            EntwineDbContext dbContext)
         {
             _logger = logger;
-            _profileService = profileService;
-            _locationService = locationService;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
@@ -31,7 +29,7 @@ namespace EntwineBackend.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var profile = _profileService.GetProfile(userId);
+            var profile = DbFunctions.GetProfile(_dbContext, userId);
 
             if (profile == null)
             {
@@ -45,7 +43,7 @@ namespace EntwineBackend.Controllers
                 DateOfBirth = profile.DateOfBirth,
                 Gender = profile.Gender,
                 Interests = profile.Interests,
-                Location = profile.Location == null ? null : _locationService.GetLocationById(profile.Location.Id)
+                Location = profile.Location == null ? null : DbFunctions.GetLocationById(_dbContext, profile.Location.Id)
             };
 
             return Ok(ownProfileReturnData);
@@ -54,7 +52,7 @@ namespace EntwineBackend.Controllers
         [HttpGet("{userId}")]
         public IActionResult GetProfileAsync(int userId)
         {
-            var profile = _profileService.GetProfile(userId);
+            var profile = DbFunctions.GetProfile(_dbContext, userId);
 
             if (profile == null)
             {
@@ -67,7 +65,7 @@ namespace EntwineBackend.Controllers
                 Age = profile.DateOfBirth == null ? null : Utils.YearsSince(profile.DateOfBirth.Value),
                 Gender = profile.Gender,
                 Interests = profile.Interests,
-                Location = profile.Location == null ? null : _locationService.GetLocationById(profile.Location.Id)
+                Location = profile.Location == null ? null : DbFunctions.GetLocationById(_dbContext, profile.Location.Id)
             };
             return Ok(dataToReturn);
         }
@@ -82,13 +80,13 @@ namespace EntwineBackend.Controllers
                 DateOfBirth = data.DateOfBirth,
                 Gender = data.Gender,
                 Interests = data.Interests,
-                Location = location is null ? null : await _locationService.GetLocationWithId(location)
+                Location = location is null ? null : await DbFunctions.GetLocationWithId(_dbContext, location)
             };
 
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             try
             {
-                await _profileService.SaveProfile(userId, User.Identity!.Name!, serviceInputProfileData);
+                await DbFunctions.SaveProfile(_dbContext, userId, User.Identity!.Name!, serviceInputProfileData);
             }
             catch (Exception)
             {

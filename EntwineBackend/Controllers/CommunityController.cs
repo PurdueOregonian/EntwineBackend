@@ -2,6 +2,7 @@ using EntwineBackend.Data;
 using EntwineBackend.DbContext;
 using EntwineBackend.PubSub;
 using EntwineBackend.Services;
+using Friends5___Backend;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -14,19 +15,13 @@ namespace EntwineBackend.Controllers
     [Authorize(Policy = "UserId")]
     public class CommunityController : ControllerBase
     {
-        private readonly ICommunityService _communityService;
-        private readonly ICommunityChatService _communityChatService;
         private readonly EntwineDbContext _dbContext;
         private readonly IHubContext<CommunityChatHub> _communityChatHubContext;
 
         public CommunityController(
-            ICommunityService communityService,
-            ICommunityChatService communityChatService,
             EntwineDbContext dbContext,
             IHubContext<CommunityChatHub> communityChatHubContext)
         {
-            _communityService = communityService;
-            _communityChatService = communityChatService;
             _dbContext = dbContext;
             _communityChatHubContext = communityChatHubContext;
         }
@@ -35,7 +30,7 @@ namespace EntwineBackend.Controllers
         public IActionResult GetCommunityAsync()
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var communityData = _communityService.GetCommunityData(userId);
+            var communityData = DbFunctions.GetCommunityData(_dbContext, userId);
             if (communityData == null)
             {
                 return NotFound();
@@ -53,7 +48,7 @@ namespace EntwineBackend.Controllers
                 return Unauthorized();
             }
 
-            var messages = _communityChatService.GetMessages(chatId);
+            var messages = DbFunctions.CommunityGetMessages(_dbContext, chatId);
             return Ok(messages);
         }
 
@@ -72,7 +67,7 @@ namespace EntwineBackend.Controllers
                 return Unauthorized();
             }
 
-            var message = await _communityChatService.SendMessage(chatId, userId, data.Content);
+            var message = await DbFunctions.CommunitySendMessage(_dbContext, chatId, userId, data.Content);
             await _communityChatHubContext.Clients.Group($"Community-{chatId.ToString()}")
                 .SendAsync("ReceiveMessage", message);
             return Ok(message);
