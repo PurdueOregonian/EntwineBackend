@@ -20,6 +20,7 @@ namespace EntwineBackend.Services
                 .Where(message => message.ChatId == chatId)
                 .Select(message => new MessageReturnData
                 {
+                    Id = message.Id,
                     Username = message.Sender.Username,
                     Content = message.Content,
                     TimeSent = message.TimeSent
@@ -41,6 +42,7 @@ namespace EntwineBackend.Services
             await _dbContext.SaveChangesAsync();
             return new MessageReturnData
             {
+                Id = newMessage.Id,
                 Username = user.Username,
                 Content = content,
                 TimeSent = newMessage.TimeSent

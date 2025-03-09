@@ -18,7 +18,7 @@ namespace EntwineBackend.Services
         public CommunityData? GetCommunityData(int userId)
         {
             var profile = _dbContext.Profiles.Include(p => p.Location).FirstOrDefault(p => p.Id == userId);
-            if (profile == null || profile.Location == null)
+            if (profile?.Location == null)
             {
                 return null;
             }
