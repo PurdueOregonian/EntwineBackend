@@ -35,8 +35,14 @@ jobs:
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
 
-      - name: Apply EF Core migrations
-        run: dotnet ef database update --project EntwineBackend/EntwineBackend.csproj --connection "${{ secrets.CONNECTIONSTRINGS__DEFAULTCONNECTION }}"
+      - name: Set Connection String
+        run: echo "ConnectionStrings__DefaultConnection=${{ secrets.ConnectionStrings__DefaultConnection }}" >> $GITHUB_ENV
+
+      - name: Debug Connection String
+        run: echo "$ConnectionStrings__DefaultConnection"
+
+      - name: Apply EF Core Migrations
+        run: dotnet ef database update --project EntwineBackend/EntwineBackend.csproj --connection "$ConnectionStrings__DefaultConnection"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
