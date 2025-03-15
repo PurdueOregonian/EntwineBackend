@@ -23,6 +23,9 @@ jobs:
         with:
           dotnet-version: '9.x'
 
+      - name: Print connection string
+        run: echo $ConnectionStrings__DefaultConnection
+
       - name: Install EF Core Tools
         run: dotnet tool install --global dotnet-ef
 
