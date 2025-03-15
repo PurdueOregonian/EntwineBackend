@@ -23,8 +23,9 @@ jobs:
         with:
           dotnet-version: '9.x'
 
-      - name: Print connection string
-        run: echo $env:ConnectionStrings__DefaultConnection
+      - name: Print all environment variables
+        run: printenv
+        shell: pwsh
 
       - name: Install EF Core Tools
         run: dotnet tool install --global dotnet-ef
