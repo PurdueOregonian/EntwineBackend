@@ -28,6 +28,7 @@ namespace Friends5___Backend
                 {
                     Id = message.Id,
                     Username = message.Sender.Username,
+                    UserId = message.Sender.Id,
                     Content = message.Content,
                     TimeSent = message.TimeSent
                 })
@@ -85,6 +86,7 @@ namespace Friends5___Backend
             {
                 Id = newMessage.Id,
                 Username = sender.Username,
+                UserId = sender.Id,
                 Content = content,
                 TimeSent = newMessage.TimeSent
             };
@@ -101,6 +103,7 @@ namespace Friends5___Backend
                 {
                     Id = message.Id,
                     Username = message.Sender.Username,
+                    UserId = message.Sender.Id,
                     Content = message.Content,
                     TimeSent = message.TimeSent
                 })
@@ -127,6 +130,7 @@ namespace Friends5___Backend
             {
                 Id = newMessage.Id,
                 Username = user.Username,
+                UserId = user.Id,
                 Content = content,
                 TimeSent = newMessage.TimeSent
             };
