@@ -36,6 +36,7 @@ namespace EntwineBackend.Services
             }
             catch(Exception e)
             {
+                var debug = _config.GetValue<string>("ConnectionStrings:DefaultConnection");
                 return IdentityResult.Failed(new IdentityError { Code = "CustomErrorCode", Description = "An error occurred while creating the user." });
             }
         }
