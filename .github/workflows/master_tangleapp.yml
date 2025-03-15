@@ -27,7 +27,7 @@ jobs:
         run: dotnet tool install --global dotnet-ef
 
       - name: Add EF Core tools to PATH
-        run: echo "DOTNET_TOOL_PATH=$(dotnet tool list --global --format json | jq -r '.[].installPath')" >> $GITHUB_ENV
+        run: echo "DOTNET_TOOL_PATH=$(dotnet --info | grep 'User-Specified SDKs' -A 1 | tail -n 1 | sed 's/^ *//')" >> $GITHUB_ENV
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
