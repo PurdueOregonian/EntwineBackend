@@ -23,18 +23,17 @@ jobs:
         with:
           dotnet-version: '9.x'
 
+      - name: Install EF Core Tools
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Add EF Core tools to PATH
+        run: echo "DOTNET_TOOL_PATH=$(dotnet tool list --global --format json | jq -r '.[].installPath')" >> $GITHUB_ENV
+
       - name: Build with dotnet
         run: dotnet build --configuration Release
 
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
-
-      - name: Install EF Core Tools
-        run: dotnet tool install --global dotnet-ef
-
-      - name: Add EF Core tools to PATH
-        run: |
-          echo "::add-path::$(dotnet tool list --global --format json | jq -r '.[].installPath')"
 
       - name: Apply EF Core migrations
         run: dotnet ef database update --project EntwineBackend/EntwineBackend.csproj
