@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D3105101-1D9D-40AA-B4E1-71596AA9B44D}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		.github\workflows\master_tangleapp.yml = .github\workflows\master_tangleapp.yml
 		README.md = README.md
 	EndProjectSection
 EndProject

@@ -42,7 +42,8 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://localhost:5173").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+        var audience = builder.Configuration.GetValue<string>("Jwt:Audience");
+        policy.WithOrigins(audience!).AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     });
 });
 
