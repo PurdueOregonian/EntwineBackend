@@ -9,19 +9,24 @@ namespace EntwineBackend.Services
         IHttpClientFactory _httpClientFactory;
         private readonly string _apiKey;
 
-        public LocationService(IHttpClientFactory httpClientFactory)
+        public LocationService(IHttpClientFactory httpClientFactory, IConfiguration config)
         {
             _httpClientFactory = httpClientFactory;
-            _apiKey = ReadApiKeyFromFile("./ApiKey.txt");
+            _apiKey = GetApiKey("./ApiKey.txt", config);
         }
 
-        private string ReadApiKeyFromFile(string filePath)
+        private string GetApiKey(string filePath, IConfiguration config)
         {
             if (File.Exists(filePath))
             {
                 return File.ReadAllText(filePath).Trim();
             }
-            throw new FileNotFoundException("API key file not found.", filePath);
+            var apiKey = config.GetValue<string>("ApiKey")!;
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                throw new FileNotFoundException("API key not found in file or configuration.");
+            }
+            return apiKey;
         }
 
         public async Task<Location?> GetLocation(

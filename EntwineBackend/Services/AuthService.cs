@@ -34,9 +34,8 @@ namespace EntwineBackend.Services
                 var result = await _userManager.CreateAsync(applicationUser, loginInfo.Password);
                 return result;
             }
-            catch(Exception e)
+            catch(Exception)
             {
-                var debug = _config.GetValue<string>("ConnectionStrings:DefaultConnection");
                 return IdentityResult.Failed(new IdentityError { Code = "CustomErrorCode", Description = "An error occurred while creating the user." });
             }
         }
