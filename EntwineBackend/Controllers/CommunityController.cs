@@ -1,7 +1,6 @@
 using EntwineBackend.Data;
 using EntwineBackend.DbContext;
 using EntwineBackend.PubSub;
-using EntwineBackend.Services;
 using Friends5___Backend;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
