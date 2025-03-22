@@ -75,7 +75,7 @@ namespace EntwineBackend.Controllers
             {
                 return Ok();
             }
-            return BadRequest(registerResult.Errors.First().Description);
+            return BadRequest(string.Join('\n', registerResult.Errors.Select(error => error.Description)));
         }
 
         [AllowAnonymous]
