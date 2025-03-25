@@ -3,6 +3,7 @@ using EntwineBackend.Data;
 using EntwineBackend.DbContext;
 using EntwineBackend.DbItems;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -322,6 +323,36 @@ namespace Friends5___Backend
         public static string? GetUsernameFromId(EntwineDbContext dbContext, int id)
         {
             return dbContext.Profiles.FirstOrDefault(p => p.Id == id)?.Username;
+        }
+
+        public static async Task<Event> CreateEvent(EntwineDbContext dbContext, int userId, CreateEventData data)
+        {
+            var user = dbContext.Users.FirstOrDefault(u => u.Id == userId);
+            var community = dbContext.Communities.FirstOrDefault(c => c.Id == data.CommunityId);
+            var newEvent = new Event
+            {
+                Community = data.CommunityId,
+                Time = data.Time,
+                OrganizerId = userId,
+                Name = data.Name,
+                UserIds = [userId],
+                MaxParticipants = data.MaxParticipants
+            };
+            dbContext.Events.Add(newEvent);
+            await dbContext.SaveChangesAsync();
+            return newEvent;
+        }
+
+        public static List<Event> GetEvents(EntwineDbContext dbContext, int userId)
+        {
+            var community = GetCommunity(dbContext, userId);
+            if (community == null)
+            {
+                return new List<Event>();
+            }
+            return [.. dbContext.Events
+                .Where(e => e.Community == community.Id && e.Time > DateTime.UtcNow)
+                .OrderBy(e => e.Time)];
         }
 
         private static async Task AddUserToCommunity(

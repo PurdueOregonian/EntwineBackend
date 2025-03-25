@@ -5,7 +5,7 @@ namespace EntwineBackend_Tests
     public class UtilsTests
     {
         [Fact]
-        public void YearsSince_CurrentDate_ReturnsZero()
+        public void YearsSince()
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.Now);
             var result = Utils.YearsSince(today);

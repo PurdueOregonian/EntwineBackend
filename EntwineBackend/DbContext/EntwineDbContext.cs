@@ -19,6 +19,7 @@ namespace EntwineBackend.DbContext
             Interests = Set<Interest>();
             Locations = Set<Location>();
             ApplicationUserLogins = Set<ApplicationUserLogin>();
+            Events = Set<Event>();
         }
 
         public DbSet<ProfileData> Profiles { get; set; }
@@ -31,6 +32,7 @@ namespace EntwineBackend.DbContext
         public DbSet<Interest> Interests { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<ApplicationUserLogin> ApplicationUserLogins { get; set; }
+        public DbSet<Event> Events { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
