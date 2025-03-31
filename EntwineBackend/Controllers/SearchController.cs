@@ -40,7 +40,7 @@ namespace EntwineBackend.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var profiles = DbFunctions.SearchProfiles(_dbContext, userId, data);
+            var profiles = DbFunctions.SearchProfiles(_dbContext, data);
 
             return Ok(profiles.Select(profile => new UserSearchResult
             {

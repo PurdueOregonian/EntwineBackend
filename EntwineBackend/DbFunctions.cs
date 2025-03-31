@@ -22,7 +22,7 @@ namespace Friends5___Backend
 
         public static List<MessageReturnData> GetMessages(EntwineDbContext dbContext, int chatId)
         {
-            return dbContext.Messages
+            return [.. dbContext.Messages
                 .Include(m => m.Sender)
                 .Where(message => message.ChatId == chatId)
                 .Select(message => new MessageReturnData
@@ -32,8 +32,7 @@ namespace Friends5___Backend
                     UserId = message.Sender.Id,
                     Content = message.Content,
                     TimeSent = message.TimeSent
-                })
-                .ToList();
+                })];
         }
 
         public static Chat? GetChat(EntwineDbContext dbContext, int chatId)
@@ -97,7 +96,7 @@ namespace Friends5___Backend
             EntwineDbContext dbContext,
             int chatId)
         {
-            return dbContext.CommunityChatMessages
+            return [.. dbContext.CommunityChatMessages
                 .Include(m => m.Sender)
                 .Where(message => message.ChatId == chatId)
                 .Select(message => new MessageReturnData
@@ -107,8 +106,7 @@ namespace Friends5___Backend
                     UserId = message.Sender.Id,
                     Content = message.Content,
                     TimeSent = message.TimeSent
-                })
-                .ToList();
+                })];
         }
 
         public static async Task<MessageReturnData> CommunitySendMessage(
@@ -290,12 +288,11 @@ namespace Friends5___Backend
             string searchString)
         {
             var matchingUsers = dbContext.Users.Where(user => user.UserName!.Contains(searchString) && user.Id != userId);
-            return matchingUsers.Select(user => new UserSearchResult { Id = user.Id, Username = user.UserName }).ToList();
+            return [.. matchingUsers.Select(user => new UserSearchResult { Id = user.Id, Username = user.UserName })];
         }
 
         public static List<ProfileData> SearchProfiles(
             EntwineDbContext dbContext,
-            int userId,
             SearchProfileParams data)
         {
             var sqlCommand = @"SELECT * FROM public.""Profiles"" WHERE " +
@@ -332,7 +329,8 @@ namespace Friends5___Backend
             var newEvent = new Event
             {
                 Community = data.CommunityId,
-                Time = data.Time,
+                StartTime = data.StartTime,
+                EndTime = data.EndTime,
                 OrganizerId = userId,
                 Name = data.Name,
                 UserIds = [userId],
@@ -348,11 +346,11 @@ namespace Friends5___Backend
             var community = GetCommunity(dbContext, userId);
             if (community == null)
             {
-                return new List<Event>();
+                return [];
             }
             return [.. dbContext.Events
-                .Where(e => e.Community == community.Id && e.Time > DateTime.UtcNow)
-                .OrderBy(e => e.Time)];
+                .Where(e => e.Community == community.Id && e.StartTime > DateTime.UtcNow)
+                .OrderBy(e => e.StartTime)];
         }
 
         private static async Task AddUserToCommunity(
