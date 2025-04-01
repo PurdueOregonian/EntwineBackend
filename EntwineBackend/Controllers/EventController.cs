@@ -23,6 +23,10 @@ namespace EntwineBackend.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var createdEvent = await DbFunctions.CreateEvent(_dbContext, userId, data);
+            if(createdEvent == null)
+            {
+                return BadRequest("User not in a community. Could not create event.");
+            }
             return Ok(createdEvent);
         }
 

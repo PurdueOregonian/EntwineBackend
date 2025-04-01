@@ -322,17 +322,21 @@ namespace Friends5___Backend
             return dbContext.Profiles.FirstOrDefault(p => p.Id == id)?.Username;
         }
 
-        public static async Task<Event> CreateEvent(EntwineDbContext dbContext, int userId, CreateEventData data)
+        public static async Task<Event?> CreateEvent(EntwineDbContext dbContext, int userId, CreateEventData data)
         {
             var user = dbContext.Users.FirstOrDefault(u => u.Id == userId);
-            var community = dbContext.Communities.FirstOrDefault(c => c.Id == data.CommunityId);
+            var community = GetCommunity(dbContext, userId);
+            if(community == null)
+            {
+                return null;
+            }
             var newEvent = new Event
             {
-                Community = data.CommunityId,
-                Start = data.StartTime,
-                End = data.EndTime,
+                Community = community.Id,
+                Start = data.Start,
+                End = data.End,
                 OrganizerId = userId,
-                Title = data.Name,
+                Title = data.Title,
                 UserIds = [userId],
                 MaxParticipants = data.MaxParticipants
             };

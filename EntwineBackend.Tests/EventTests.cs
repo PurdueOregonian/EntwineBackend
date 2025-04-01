@@ -23,10 +23,9 @@ namespace EntwineBackend_Tests
             try
             {
                 var createEventData = new CreateEventData {
-                    CommunityId = 1,
-                    StartTime = new DateTime(2030, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                    EndTime = new DateTime(2030, 1, 1, 4, 0, 0, DateTimeKind.Utc),
-                    Name = "Some Event",
+                    Start = new DateTime(2030, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    End = new DateTime(2030, 1, 1, 4, 0, 0, DateTimeKind.Utc),
+                    Title = "Some Event",
                     MaxParticipants = 10
                 };
                 var json = JsonSerializer.Serialize(createEventData, DefaultJsonOptions.Instance);
@@ -45,6 +44,7 @@ namespace EntwineBackend_Tests
                 responseContent = await response.Content.ReadAsStringAsync();
                 var events = JsonSerializer.Deserialize<List<Event>>(responseContent, DefaultJsonOptions.Instance);
                 Assert.Single(events!);
+                Assert.Equal(1, events![0].Community);
                 Assert.Equal("Some Event", events![0].Title);
                 Assert.Equal(2030, events[0].Start.Year);
                 Assert.Equal(0, events[0].Start.Hour);
