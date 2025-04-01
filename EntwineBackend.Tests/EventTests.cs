@@ -37,7 +37,7 @@ namespace EntwineBackend_Tests
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var newEvent = JsonSerializer.Deserialize<Event>(responseContent, DefaultJsonOptions.Instance);
-                Assert.Equal("Some Event", newEvent!.Name);
+                Assert.Equal("Some Event", newEvent!.Title);
 
                 requestUrl = "/Events";
                 response = await _client.GetAsync(requestUrl);
@@ -45,11 +45,11 @@ namespace EntwineBackend_Tests
                 responseContent = await response.Content.ReadAsStringAsync();
                 var events = JsonSerializer.Deserialize<List<Event>>(responseContent, DefaultJsonOptions.Instance);
                 Assert.Single(events!);
-                Assert.Equal("Some Event", events![0].Name);
-                Assert.Equal(2030, events[0].StartTime.Year);
-                Assert.Equal(0, events[0].StartTime.Hour);
-                Assert.Equal(2030, events[0].EndTime.Year);
-                Assert.Equal(4, events[0].EndTime.Hour);
+                Assert.Equal("Some Event", events![0].Title);
+                Assert.Equal(2030, events[0].Start.Year);
+                Assert.Equal(0, events[0].Start.Hour);
+                Assert.Equal(2030, events[0].End.Year);
+                Assert.Equal(4, events[0].End.Hour);
             }
             finally
             {

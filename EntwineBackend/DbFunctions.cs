@@ -329,10 +329,10 @@ namespace Friends5___Backend
             var newEvent = new Event
             {
                 Community = data.CommunityId,
-                StartTime = data.StartTime,
-                EndTime = data.EndTime,
+                Start = data.StartTime,
+                End = data.EndTime,
                 OrganizerId = userId,
-                Name = data.Name,
+                Title = data.Name,
                 UserIds = [userId],
                 MaxParticipants = data.MaxParticipants
             };
@@ -349,8 +349,8 @@ namespace Friends5___Backend
                 return [];
             }
             return [.. dbContext.Events
-                .Where(e => e.Community == community.Id && e.StartTime > DateTime.UtcNow)
-                .OrderBy(e => e.StartTime)];
+                .Where(e => e.Community == community.Id && e.Start > DateTime.UtcNow)
+                .OrderBy(e => e.Start)];
         }
 
         private static async Task AddUserToCommunity(
